@@ -11,12 +11,12 @@ classdef link
     % - y-axis = axis to form right handed reference frame
 
     properties
-        Length       % [m]
-        Diameter     % [mm]
-        Thickness    % [mm]
-        Density      % [g/cm^3]
-        Mass         % [kg]
-        Inertia      % [kg*m^2]
+        Length {mustBePositive}       % [m]
+        Diameter {mustBePositive}     % [mm]
+        Thickness {mustBePositive}    % [mm]
+        Density {mustBePositive}      % [g/cm^3]
+        Mass {mustBePositive}         % [kg]
+        Inertia                       % [kg*m^2]
     end
 
     methods
