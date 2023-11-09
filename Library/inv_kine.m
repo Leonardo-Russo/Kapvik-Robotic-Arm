@@ -29,8 +29,8 @@ OptionsPSO = optimoptions('particleswarm', ...
 
 
 % Set the Joint Variable Boundaries
-lb = [-2*pi, -2*pi, -2*pi, -2*pi];
-ub = [2*pi, 2*pi, 2*pi, 2*pi];
+lb = [deg2rad(-160), deg2rad(-90), deg2rad(-150), deg2rad(-90)];
+ub = [deg2rad(100), deg2rad(90), deg2rad(110), deg2rad(5)];
 
 dim = 4;        % n° of joint variables
 

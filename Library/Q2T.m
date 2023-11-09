@@ -4,7 +4,7 @@ function T = Q2T(Q)
 % and computes the transformation matrix from i to i-1.
 % 
 % Inputs: 
-% Q = joint variables on the i-th row of the MDH Table
+% Q = i-th row of the MDH Table
 % 
 % Outputs: 
 % T = transformation matrix from i to i-1
