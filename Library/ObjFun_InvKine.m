@@ -10,7 +10,7 @@ function J = ObjFun_InvKine(Q, X0)
 % J = cost value
 
 % Compute the new Carthesian State
-X = fkine(Q);
+X = fkine(Q); %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Compute Carthesian State Error
 eps = X - X0;
@@ -21,7 +21,4 @@ alpha = 1e3;
 % Compute Cost Value
 J = sum(abs(eps(1:3))) + alpha*sum(abs(eps(4:6)));
 
-end
-
-function fkine()
 end
