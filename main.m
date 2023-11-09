@@ -1,8 +1,8 @@
 %% Space Robotic Systems - Project
 
 close all
-clear all
-clc
+clear
+clc all
 
 addpath('Library/')
 
