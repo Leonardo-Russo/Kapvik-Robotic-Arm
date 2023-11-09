@@ -1,4 +1,4 @@
-function [T_T2S] = where_fun(T_S2B, T_W2T, T_T2W)
+function [T_T2S] = where_fun(T_S2B, T_W2B, T_T2W)
 % Description: This function computes the transformation beetween the tool
 % frame and the station frame (AFTER FOWARD KINEMATIC).
 % Inputs:
@@ -11,5 +11,5 @@ function [T_T2S] = where_fun(T_S2B, T_W2T, T_T2W)
 % Outputs:
 % T_T2S = Transformation matrix from tool frame to station frame
 
-T_T2S = T_S2B\T_W2T*T_T2W;
+T_T2S = T_S2B\T_W2B*T_T2W;
 end
