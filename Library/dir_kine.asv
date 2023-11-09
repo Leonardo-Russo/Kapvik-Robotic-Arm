@@ -1,0 +1,30 @@
+function [T_B_W] = dir_kine(table)
+% Description: This function computes the foward kinematic using
+% the MDH table in input.
+% Inputs:
+% table = MDH table
+% 
+% Outputs:
+% T_B_W = Transformation matrix from base frame to wrist frame
+
+
+alfa=ones(4,1);    % preallocation
+a=ones(4,1);       % preallocation
+d=ones(4,1);       % preallocation
+theta=ones(4,1);   % preallocation
+TW_B=eye(4);       % preallocation
+
+for i=1:4
+    alfa(i)=obj.MDH_table(i,1); % [°]
+    a(i)=obj.MDH_table(i,2);
+    d(i)=obj.MDH_table(i,3);
+    theta(i)=obj.MDH_table(i,4); % [°]
+    TW_Bj=[cosd(theta(i)) -sind(theta(i)) 0 a(i);...
+        sind(theta(i))*cosd(alfa(i)) cosd(theta(i))*cosd(alfa(i)) -sind(alfa(i)) -sind(alfa(i))*d(i);...
+        sind(theta(i))*sind(alfa(i)) cosd(theta(i))*sind(alfa(i)) cosd(alfa(i)) cosd(alfa(i))*d(i);...
+        0 0 0 1];
+    TW_B=TW_B*TW_Bj;
+end
+
+
+end

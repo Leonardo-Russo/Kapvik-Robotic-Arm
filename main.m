@@ -2,7 +2,7 @@
 
 close all
 clear
-clc all
+clc 
 
 addpath('Library/')
 

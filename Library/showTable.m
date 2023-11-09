@@ -8,7 +8,7 @@ ds = MDH_Table(:, 3);
 thetas = MDH_Table(:, 4);
 
 fprintf('\n\n\t\t\t\t\t <strong>MDH Table</strong>\n\n')
-disp(table(indices, alphas, as, ds, thetas, 'VariableNames', ["i", "alpha(i-1)", "a(i-1)", "d(i)", "theta(i)"]))
+disp(table(indices, alphas, double(as), ds, thetas, 'VariableNames', ["i", "alpha(i-1)", "a(i-1)", "d(i)", "theta(i)"]))
 
 
 
