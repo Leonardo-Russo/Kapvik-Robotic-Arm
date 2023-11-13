@@ -1,4 +1,4 @@
-classdef Link
+classdef link
     % Description: This class includes links properties and compute mass
     % and inertia matrix of its link in his principal reference frame
     %
@@ -12,7 +12,7 @@ classdef Link
 
     properties
         Length {mustBePositive}       % [m]
-        Diameter {mustBePositive}     % [mm]
+        Diameter {mustBePositive}     % [mm] - outer diameter
         Thickness {mustBePositive}    % [mm]
         Density {mustBePositive}      % [g/cm^3]
         Mass {mustBePositive}         % [kg]
@@ -20,7 +20,7 @@ classdef Link
     end
 
     methods
-        function obj = Link(Length, Diameter, Thickness, Density)
+        function obj = link(Length, Diameter, Thickness, Density)
             obj.Length = Length;                                    % [m]
             obj.Diameter = Diameter;                                % [mm]
             obj.Thickness = Thickness;                              % [mm]

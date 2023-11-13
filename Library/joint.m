@@ -1,4 +1,4 @@
-classdef Joint
+classdef joint
     % Description: This class includes joints properties
     properties
         Mass {mustBePositive}                       % [kg]
@@ -10,7 +10,7 @@ classdef Joint
     end
 
     methods
-        function obj = Joint(Mass, Gear_Ratio, Theta_min, Theta_max, Friction_Torque_max, Friction_Torque_min)
+        function obj = joint(Mass, Gear_Ratio, Theta_min, Theta_max, Friction_Torque_max, Friction_Torque_min)
             obj.Mass = Mass;
             obj.Gear_Ratio = Gear_Ratio;                             % [kg]
             obj.Theta_min = Theta_min;                               % [adim]
