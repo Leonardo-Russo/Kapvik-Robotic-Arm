@@ -25,9 +25,8 @@ yy_rotated = reshape(rotated_points(2,:), size(yy));
 zz_rotated = reshape(rotated_points(3,:), size(zz));
 
 % Plot the cylinder
-s = surf(xx_rotated, yy_rotated, zz_rotated);
-s.EdgeColor = 'none'; % This removes the black lines
-hold on; % Hold on to the current plot so that we can add the end caps
+s = surf(xx_rotated, yy_rotated, zz_rotated, 'EdgeColor', 'none');
+hold on
 
 % Calculate the end cap coordinates
 end_cap_top_x = xx_rotated(1, :);
@@ -42,14 +41,7 @@ end_cap_bottom_z = zz_rotated(2, :);
 top_end = fill3(end_cap_top_x, end_cap_top_y, end_cap_top_z, 'y', 'EdgeColor','none'); % Top circle
 bot_end = fill3(end_cap_bottom_x, end_cap_bottom_y, end_cap_bottom_z, 'y', 'EdgeColor','none'); % Bottom circle
 
-% Release the hold on the current plot
-hold off;
-
-axis equal; % To maintain aspect ratio
-xlabel('X-axis');
-ylabel('Y-axis');
-zlabel('Z-axis');
-title('Robotic Arm as Cylinder');
+axis equal
 
 Body = struct('name', "Test Cylinder");
 Body.surfs = [s, top_end, bot_end];
