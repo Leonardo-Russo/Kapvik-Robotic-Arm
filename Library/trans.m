@@ -1,4 +1,4 @@
-function y = tform(T, z)
+function y = trans(T, z)
 % Description: this function computes the transformation of a vector using
 % the transformation matrix in input.
 % 
