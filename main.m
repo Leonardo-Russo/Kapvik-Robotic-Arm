@@ -11,7 +11,7 @@ h = 0.5;
 
 %% Define MDH Table
 
-syms q1 q2 q3 q4
+syms q1 q2 q3 q4 real
 
 TableMDH = defineTable(q1, q2, q3, q4);
 
@@ -25,8 +25,8 @@ P_T = [0 0 0]';
 T_T2W = [eye(3), P_T;
          zeros(1, 3), 1];
 
-TableMDH = double(subs(TableMDH, [q1, q2, q3, q4], [pi/2, 0, 0, 0]));
-showTable(TableMDH)
+% TableMDH = double(subs(TableMDH, [q1, q2, q3, q4], [pi/2, 0, 0, 0]));
+% showTable(TableMDH)
 
 %% Define links and joints properties
 
@@ -40,26 +40,27 @@ Joint_4=joint(0.67, 6.7,  -90,   5, 1.5*10^(-4), -5*10^(-4));
 
 %% Test
 
-[T_W2B] = dir_kine(TableMDH)
+[T_W2B] = simplify(dir_kine(TableMDH));
 [T_T2S] = where_fun(T_S2B, T_W2B, T_T2W);
-X = trans2pose(T_T2S)
+X = simplify(trans2pose(T_T2S));
 
+J = simplify(jacobian(X, [q1 q2 q3 q4]));
 
 %% Plots
 
-close all
-
-figure('name', 'Workspace')
-
-% plot3(0, 0, 0, 'b*')    % Station Origin
-show_frame(zeros(6, 1), 'b')
-xlabel('x')
-ylabel('y')
-zlabel('z')
-hold on
-show_frame([P_B; zeros(3, 1)], 'r')
-
-grid on
-axis([-1 1 -1 1 -1 1])
-show_frame(X, '#eb34e5')
+% close all
+% 
+% figure('name', 'Workspace')
+% 
+% % plot3(0, 0, 0, 'b*')    % Station Origin
+% show_frame(zeros(6, 1), 'b')
+% xlabel('x')
+% ylabel('y')
+% zlabel('z')
+% hold on
+% show_frame([P_B; zeros(3, 1)], 'r')
+% 
+% grid on
+% axis([-1 1 -1 1 -1 1])
+% show_frame(X, '#eb34e5')
 
