@@ -35,7 +35,11 @@ ub = [deg2rad(100), deg2rad(90), deg2rad(110), deg2rad(5)];
 dim = 4;        % n° of joint variables
 
 % Perform the Optimization
-Q = particleswarm(@(Q) InvKineObjFun(Q, X), dim, lb, ub, OptionsPSO);
+% [T_W2B] = dir_kine(table);
+% [T_T2S] = where_fun(T_S2B, T_W2B, T_T2W);
+% [X] = trans2pose(T_T2S);
+
+Q = particleswarm(@(Q) ObjFun_InvKine(Q, X), dim, lb, ub, OptionsPSO);
 
 
 end

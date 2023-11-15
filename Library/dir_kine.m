@@ -7,6 +7,9 @@ function [T_W2B] = dir_kine(table)
 % Outputs:
 % T_B2W = Transformation matrix from base frame to wrist frame
 
+T_W2B = [eye(3), zeros(3, 1);
+         zeros(1, 3), 1];
+
 for i = 1:4
     T_W2Bj = tableRow2T(table(i, :));
     T_W2B=T_W2B*T_W2Bj;
