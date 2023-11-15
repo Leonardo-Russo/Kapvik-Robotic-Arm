@@ -15,15 +15,25 @@ syms q1 q2 q3 q4 real
 
 TableMDH = defineTable(q1, q2, q3, q4);
 
-P_B = [0 -0.1 h]';
-T_B2S = [eye(3), P_B;
-         zeros(1, 3), 1];
 
+%% Define Station and Base Reference Frames
+
+R_B = eye(3);
+P_B = [0 -0.1 h]';
+T_B2S = buildT(R_B, P_B);
 T_S2B = inv_trans(T_B2S);
 
+R_T = eye(3);
 P_T = [0 0 0]';
-T_T2W = [eye(3), P_T;
-         zeros(1, 3), 1];
+T_T2W = buildT(R_T, P_T);
+
+%% Compute Jacobian Matrix
+
+[T_W2B] = simplify(dir_kine(TableMDH));
+[T_T2S] = where_fun(T_S2B, T_W2B, T_T2W);
+X = simplify(trans2pose(T_T2S));
+
+J = simplify(jacobian(X, [q1 q2 q3 q4]));
 
 % TableMDH = double(subs(TableMDH, [q1, q2, q3, q4], [pi/2, 0, 0, 0]));
 % showTable(TableMDH)
@@ -37,6 +47,7 @@ Joint_1=joint(1.15, 8.4, -160, 100, 1.5*10^(-4), -5*10^(-4));
 Joint_2=joint(1.28, 8.4,  -90,  90, 1.5*10^(-4), -5*10^(-4));
 Joint_3=joint(1.39, 5.3, -150, 110, 1.5*10^(-4), -5*10^(-4));
 Joint_4=joint(0.67, 6.7,  -90,   5, 1.5*10^(-4), -5*10^(-4));
+
 
 %% Test
 
@@ -63,4 +74,6 @@ J = simplify(jacobian(X, [q1 q2 q3 q4]));
 % grid on
 % axis([-1 1 -1 1 -1 1])
 % show_frame(X, '#eb34e5')
+
+plot3DBox(10, 5, 3);
 

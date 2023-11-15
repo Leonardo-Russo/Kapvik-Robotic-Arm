@@ -10,6 +10,7 @@ function y = trans(T, z)
 % y = post-transformation 3x1 vector
 
 if size(z, 1) == 1 || size(z, 2) == 3
+    z = z';
     warning('Wrong Dimensions for the Transformation -> input vector was transposed.')
 end
 
