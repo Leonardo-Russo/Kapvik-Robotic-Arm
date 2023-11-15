@@ -14,7 +14,7 @@ if size(P, 1) == 1 || size(P, 2) == 3
     warning('Wrong Dimensions for the Transformation -> input vector was transposed.')
 end
 
-if size(z, 1) ~= 3 || size(z, 2) ~= 1
+if size(P, 1) ~= 3 || size(P, 2) ~= 1
     error('Wrong Dimensions for the Transformation.')
 end
 

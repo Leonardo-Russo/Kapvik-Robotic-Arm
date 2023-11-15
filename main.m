@@ -15,7 +15,6 @@ syms q1 q2 q3 q4 real
 
 TableMDH = defineTable(q1, q2, q3, q4);
 
-
 %% Define Station and Base Reference Frames
 
 R_B = eye(3);
@@ -48,14 +47,6 @@ Joint_2=joint(1.28, 8.4,  -90,  90, 1.5*10^(-4), -5*10^(-4));
 Joint_3=joint(1.39, 5.3, -150, 110, 1.5*10^(-4), -5*10^(-4));
 Joint_4=joint(0.67, 6.7,  -90,   5, 1.5*10^(-4), -5*10^(-4));
 
-
-%% Test
-
-[T_W2B] = simplify(dir_kine(TableMDH));
-[T_T2S] = where_fun(T_S2B, T_W2B, T_T2W);
-X = simplify(trans2pose(T_T2S));
-
-J = simplify(jacobian(X, [q1 q2 q3 q4]));
 
 %% Plots
 
