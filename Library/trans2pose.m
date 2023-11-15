@@ -12,7 +12,7 @@ function [X] = trans2pose(T_T2S)
 % pitch = angle along y in the intervall [-pi/2; pi/2]
 % yaw = angle along z in the intervall [-pi; pi)
 
-R = T_T2S(1:3,1:3);
+R = T_T2S(1:3,1:3)';
 X(1:3,1) = T_T2S(1:3,4);
 pitch = -asin(R(1,3));
 roll = 2*atan((R(2,3)/cos(pitch))/(1+((R(3,3)/cos(pitch)))));

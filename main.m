@@ -40,11 +40,11 @@ Joint_4=joint(0.67, 6.7,  -90,   5, 1.5*10^(-4), -5*10^(-4));
 
 %% Test
 
-[T_W2B] = dir_kine(TableMDH);
+[T_W2B] = dir_kine(TableMDH)
 [T_T2S] = where_fun(T_S2B, T_W2B, T_T2W);
 X = trans2pose(T_T2S)
-X(4)=pi/2;
-X(6)=0;
+
+
 %% Plots
 
 close all
@@ -62,7 +62,4 @@ show_frame([P_B; zeros(3, 1)], 'r')
 grid on
 axis([-1 1 -1 1 -1 1])
 show_frame(X, '#eb34e5')
-
-
-%% Toolbox test
 
