@@ -21,7 +21,6 @@ faces = [1, 2, 6, 5;    % Front face
          2, 3, 7, 6;    % Right face
          3, 4, 8, 7;    % Back face
          4, 1, 5, 8;    % Left face
-         1, 2, 3, 4;    % Bottom face
          5, 6, 7, 8];   % Top face
 
 % Plot the Box

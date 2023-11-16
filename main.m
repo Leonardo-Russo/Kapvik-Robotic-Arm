@@ -13,7 +13,7 @@ h = 0.5;
 
 syms q1 q2 q3 q4 real
 
-TableMDH = defineTable(q1, q2, q3, q4);
+TableMDH = define_table(q1, q2, q3, q4);
 
 %% Define Station and Base Reference Frames
 
@@ -51,7 +51,7 @@ close all
 
 % Compute Necessary Variables
 TableMDH = double(subs(TableMDH, [q1, q2, q3, q4], [pi/2, 0, 0, 0]));
-showTable(TableMDH)
+show_table(TableMDH)
 T_W2B = dir_kine(TableMDH);
 T_T2S = where_fun(T_S2B, T_W2B, T_T2W);
 X = trans2pose(T_T2S);
@@ -62,8 +62,10 @@ show_frame(zeros(6, 1), 'k', "S")                   % Station frame
 show_frame([P_B; zeros(3, 1)], '#2b31ed', "B")      % Base frame
 show_frame(X, '#e84f1c', "T")                       % Tool frame
 plot3DBox(L, 0.5, h);                               % Create the Box
+show_plane([1 0 0], [0 1 0], [0 0 0])               % Create the Ground
 
 
-
-
-
+T_12B = tableRow2T(TableMDH(1, :));
+T_12S = T_12B * T_B2S;
+show_frame(trans2pose(T_12S), "k", "1")
+DrawLink(Upper_Arm, T_12S);

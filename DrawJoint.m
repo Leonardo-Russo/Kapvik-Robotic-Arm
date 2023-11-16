@@ -1,4 +1,4 @@
-function show_joint(inner_diameter, outer_diameter, length, axis_orientation, rotation_angle)
+function DrawJoint(inner_diameter, outer_diameter, length, axis_orientation, rotation_angle)
 % Description: Draws a revolute joint consisting of two cylinders in 3D
 % space.
     
