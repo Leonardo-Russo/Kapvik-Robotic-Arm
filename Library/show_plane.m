@@ -22,6 +22,6 @@ X = x1 + u(1)*P + v(1)*Q;
 Y = y1 + u(2)*P + v(2)*Q; 
 Z = z1 + u(3)*P + v(3)*Q;
 
-surf(X,Y,Z, 'FaceColor', color, 'FaceAlpha', 0.25, 'EdgeAlpha', 0.25)
+surf(X,Y,Z, 'FaceColor', color, 'FaceAlpha', 0.25, 'EdgeAlpha', 0.25, 'HandleVisibility','off')
 
 end
