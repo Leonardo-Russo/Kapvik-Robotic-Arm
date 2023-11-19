@@ -24,6 +24,6 @@ faces = [1, 2, 6, 5;    % Front face
          5, 6, 7, 8];   % Top face
 
 % Plot the Box
-patch('Vertices',[x',y',z'], 'Faces',faces, 'FaceColor', facecolor, 'EdgeColor', edgecolor, 'FaceAlpha', 0.55);
+patch('Vertices',[x',y',z'], 'Faces',faces, 'FaceColor', facecolor, 'EdgeColor', edgecolor, 'FaceAlpha', 0.55, 'HandleVisibility','off');
 
 end
