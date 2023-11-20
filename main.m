@@ -14,7 +14,7 @@ l = 0.1;
 
 syms q1 q2 q3 q4 real
 
-TableMDH = define_table(q1, q2, q3, q4);
+TableMDHsym = define_table(q1, q2, q3, q4);
 
 %% Define Station and Base Reference Frames
 
@@ -29,11 +29,11 @@ T_T2W = buildT(R_T, P_T);
 
 %% Compute Jacobian Matrix
 
-[T_W2B] = simplify(dir_kine(TableMDH));
-[T_T2S] = where_fun(T_S2B, T_W2B, T_T2W);
-X = simplify(trans2pose(T_T2S));
+T_W2Bsym = simplify(dirkine(TableMDHsym));
+T_T2Ssym = where_fun(T_S2B, T_W2Bsym, T_T2W);
+Xsym = simplify(trans2pose(T_T2Ssym));
 
-J = simplify(jacobian(X, [q1 q2 q3 q4]));
+Jsym = simplify(jacobian(Xsym, [q1 q2 q3 q4]));
 
 %% Define links and joints properties
 
@@ -48,19 +48,31 @@ Joint_4=joint(0.67, 6.7,  -90,   5, 1.5*10^(-4), -5*10^(-4));
 
 %% Testing for Inverse Kinematics
 
-X0 = double(subs(X, [q1, q2, q3, q4], [pi/12 pi/9, -pi/4, pi/4]))
+X0 = double(subs(Xsym, [q1, q2, q3, q4], [pi/12 pi/9, -pi/4, pi/4]));
 
-Q = inv_kine_GM(X0, [q1, q2, q3, q4], X)
+tic
+Q = invkine(X0, [q1, q2, q3, q4], Xsym);
+stopwatch = toc;
 
-X1 = double(subs(X, [q1, q2, q3, q4], [Q(1), Q(2), Q(3), Q(4)]))
+X1 = double(subs(Xsym, [q1, q2, q3, q4], [Q(1), Q(2), Q(3), Q(4)]));
+
+fprintf('\nThe desired pose was:\n [%.4f \t%.4f \t%.4f \t%.4f \t%.4f \t%.4f]\n', X0(:))
+fprintf('\nThe retrieved joint variables yield this new pose:\n [%.4f \t%.4f \t%.4f \t%.4f \t%.4f \t%.4f]\n', X1(:))
+fprintf('\nThe time required was: %.2f s\n', stopwatch)
 
 
 %% Plots
 
 close all
 
+% Set the Joint Variables
+Q = [pi/12 pi/9, -pi/4, pi/4];
+
 % Compute Necessary Variables
-X = double(subs(X, [q1, q2, q3, q4], [pi/12 pi/9, -pi/4, pi/4]));
+TableMDH = double(subs(TableMDHsym, [q1, q2, q3, q4], [Q(1), Q(2), Q(3), Q(4)]));
+T_W2B = double(subs(T_W2Bsym, [q1, q2, q3, q4], [Q(1), Q(2), Q(3), Q(4)]));
+T_T2S = double(subs(T_T2Ssym, [q1, q2, q3, q4], [Q(1), Q(2), Q(3), Q(4)]));
+X = double(subs(Xsym, [q1, q2, q3, q4], [Q(1), Q(2), Q(3), Q(4)]));
 
 % Create the Workspace
 figure('name', 'Workspace Test', 'WindowState', 'maximized')
@@ -92,41 +104,3 @@ legend('Station frame', 'Base frame', 'Tool frame', '$1^{st}$ joint frame',...
     '$2^{nd}$ joint frame', '$3^{rd}$ joint frame', '$4^{th}$ joint frame (wrist frame)',...
     'fontsize', 12,'Interpreter', 'latex')
 
-
-%% Test 201241i23y1
-
-I = eye(3);
-
-X_T = trans2pose(T_W2S);
-
-roll = rad2deg(X(4))
-pitch = rad2deg(X(5))
-yaw = rad2deg(X(6))
-
-% I = R3(X(6))*I;
-% I = R2(X(5))*I;
-% I = R1(X(4))*I;
-
-I = R3(15, "deg")*I;
-I = R2(-20, "deg")*I;
-I = R1(90, "deg")*I;
-
-yaw = q1;
-
-pitch = q2 + q3 + q4;
-
-roll = pi/2;
-
-
-% show_frame(trans2pose(buildT(I, zeros(3, 1))), '#a83232');
-
-
-% show_frame(trans2pose(buildT(I, zeros(3, 1))), '#a83232');
-
-
-show_frame(trans2pose(buildT(I', [0.802717233896431, 0.115087434573093, 0.271377230763900]')), '#a83232');
-
-
-%%
-
-inv_kine_anal()

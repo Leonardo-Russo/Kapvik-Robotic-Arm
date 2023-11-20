@@ -1,4 +1,4 @@
-function inv_kine_anal(Xd, P_B)
+function invkineAN(Xd, P_B)
 % Description: analytical inverse kinematics.
 
 % Retrieve Data from Input

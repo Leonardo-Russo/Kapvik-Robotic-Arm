@@ -1,4 +1,4 @@
-function Q0 = inv_kine_GM(X0, Qsym, Xsym)
+function Q0 = invkineGM(X0, Qsym, Xsym)
 % Description: this function computes the inverse kinematics using the
 % Gradient Method.
 % 
