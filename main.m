@@ -24,7 +24,9 @@ T_B2S = buildT(R_B, P_B);
 T_S2B = inv_trans(T_B2S);
 
 R_T = eye(3);
-P_T = [0 0 0]';
+
+P_T = [0.05 0 0]';
+
 T_T2W = buildT(R_T, P_T);
 
 %% Compute Jacobian Matrix
@@ -46,6 +48,7 @@ Joint_3=joint(1.39, 5.3, -150, 110, 1.5*10^(-4), -5*10^(-4));
 Joint_4=joint(0.67, 6.7,  -90,   5, 1.5*10^(-4), -5*10^(-4));
 
 
+
 %% Testing for Inverse Kinematics
 
 X0 = double(subs(Xsym, [q1, q2, q3, q4], [pi/12 pi/9, -pi/4, pi/4]));
@@ -60,7 +63,6 @@ fprintf('\nThe desired pose was:\n [%.4f \t%.4f \t%.4f \t%.4f \t%.4f \t%.4f]\n',
 fprintf('\nThe retrieved joint variables yield this new pose:\n [%.4f \t%.4f \t%.4f \t%.4f \t%.4f \t%.4f]\n', X1(:))
 fprintf('\nThe time required was: %.2f s\n', stopwatch)
 
-
 %% Plots
 
 close all
@@ -69,6 +71,7 @@ close all
 Q = [pi/12 pi/9, -pi/4, pi/4];
 
 % Compute Necessary Variables
+
 TableMDH = double(subs(TableMDHsym, [q1, q2, q3, q4], [Q(1), Q(2), Q(3), Q(4)]));
 T_W2B = double(subs(T_W2Bsym, [q1, q2, q3, q4], [Q(1), Q(2), Q(3), Q(4)]));
 T_T2S = double(subs(T_T2Ssym, [q1, q2, q3, q4], [Q(1), Q(2), Q(3), Q(4)]));
@@ -90,16 +93,19 @@ T_322 = tableRow2T(TableMDH(3, :));
 T_32S = T_B2S * T_12B * T_221 * T_322;
 T_W23 = tableRow2T(TableMDH(4, :));
 T_W2S = T_B2S * T_12B * T_221 * T_322 * T_W23;
+T_T2W = [eye(3), P_T; 0 0 0 1];
+T_T2S = T_B2S * T_12B * T_221 * T_322 * T_W23 * T_T2W;
 show_frame(trans2pose(T_12S), "g", "1")
 show_frame(trans2pose(T_22S), "c", "2")
 show_frame(trans2pose(T_32S), "m", "3")
 show_frame(trans2pose(T_W2S), "#EDB120", "W")
-DrawJoint(0.03, 0.05, 0.09, T_12S) % first joint
-DrawJoint(0.03, 0.05, 0.09, T_22S) % second joint
-DrawJoint(0.03, 0.05, 0.09, T_32S) % third joint
-DrawJoint(0.03, 0.05, 0.09, T_W2S) % fourth joint
+DrawJoint(0.03, 0.05, 0.1, T_12S) % first joint
+DrawJoint(0.03, 0.05, 0.1, T_22S) % second joint
+DrawJoint(0.03, 0.05, 0.1, T_32S) % third joint
+DrawJoint(0.03, 0.05, 0.1, T_W2S) % fourth joint
 DrawLink(Upper_Arm, T_22S); % first link
 DrawLink(Fore_Arm, T_32S);  % second link
+plotScoop(P_T(1), T_12S, T_22S, T_W2S) % Scoop
 legend('Station frame', 'Base frame', 'Tool frame', '$1^{st}$ joint frame',...
     '$2^{nd}$ joint frame', '$3^{rd}$ joint frame', '$4^{th}$ joint frame (wrist frame)',...
     'fontsize', 12,'Interpreter', 'latex')
