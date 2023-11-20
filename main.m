@@ -23,7 +23,7 @@ T_B2S = buildT(R_B, P_B);
 T_S2B = inv_trans(T_B2S);
 
 R_T = eye(3);
-P_T = [0.1 0 0]';
+P_T = [0.05 0 0]';
 T_T2W = buildT(R_T, P_T);
 
 %% Compute Jacobian Matrix
@@ -44,17 +44,13 @@ Joint_2=joint(1.28, 8.4,  -90,  90, 1.5*10^(-4), -5*10^(-4));
 Joint_3=joint(1.39, 5.3, -150, 110, 1.5*10^(-4), -5*10^(-4));
 Joint_4=joint(0.67, 6.7,  -90,   5, 1.5*10^(-4), -5*10^(-4));
 
-
 %% Plots
 
 close all
 
 % Compute Necessary Variables
+X = double(subs(X, [q1, q2, q3, q4], [pi/12 pi/9, -pi/4, pi/4]));
 TableMDH = double(subs(TableMDH, [q1, q2, q3, q4], [pi/12 pi/9, -pi/4, pi/4]));
-show_table(TableMDH)
-T_W2B = dir_kine(TableMDH);
-T_T2S = where_fun(T_S2B, T_W2B, T_T2W);
-X = trans2pose(T_T2S);
 
 % Create the Workspace
 figure('name', 'Workspace Test')
@@ -72,16 +68,19 @@ T_322 = tableRow2T(TableMDH(3, :));
 T_32S = T_B2S * T_12B * T_221 * T_322;
 T_W23 = tableRow2T(TableMDH(4, :));
 T_W2S = T_B2S * T_12B * T_221 * T_322 * T_W23;
+T_T2W = [eye(3), P_T; 0 0 0 1];
+T_T2S = T_B2S * T_12B * T_221 * T_322 * T_W23 * T_T2W;
 show_frame(trans2pose(T_12S), "g", "1")
 show_frame(trans2pose(T_22S), "c", "2")
 show_frame(trans2pose(T_32S), "m", "3")
 show_frame(trans2pose(T_W2S), "#EDB120", "W")
-DrawJoint(0.03, 0.05, 0.09, T_12S) % first joint
-DrawJoint(0.03, 0.05, 0.09, T_22S) % second joint
-DrawJoint(0.03, 0.05, 0.09, T_32S) % third joint
-DrawJoint(0.03, 0.05, 0.09, T_W2S) % fourth joint
+DrawJoint(0.03, 0.05, 0.1, T_12S) % first joint
+DrawJoint(0.03, 0.05, 0.1, T_22S) % second joint
+DrawJoint(0.03, 0.05, 0.1, T_32S) % third joint
+DrawJoint(0.03, 0.05, 0.1, T_W2S) % fourth joint
 DrawLink(Upper_Arm, T_22S); % first link
 DrawLink(Fore_Arm, T_32S);  % second link
+plotScoop(P_T(1), T_12S, T_22S, T_W2S) % Scoop
 legend('Station frame', 'Base frame', 'Tool frame', '$1^{st}$ joint frame',...
     '$2^{nd}$ joint frame', '$3^{rd}$ joint frame', '$4^{th}$ joint frame (wrist frame)',...
     'fontsize', 12,'Interpreter', 'latex')
