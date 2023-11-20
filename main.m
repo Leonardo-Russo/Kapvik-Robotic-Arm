@@ -7,7 +7,7 @@ clc
 addpath('Library/')
 
 L = 0.7;
-h = 0.5;
+h = 0.3;
 
 %% Define MDH Table
 
@@ -50,7 +50,7 @@ Joint_4=joint(0.67, 6.7,  -90,   5, 1.5*10^(-4), -5*10^(-4));
 close all
 
 % Compute Necessary Variables
-TableMDH = double(subs(TableMDH, [q1, q2, q3, q4], [pi/6 pi/12, -pi/4, pi/4]));
+TableMDH = double(subs(TableMDH, [q1, q2, q3, q4], [pi/12 pi/9, -pi/4, pi/4]));
 show_table(TableMDH)
 T_W2B = dir_kine(TableMDH);
 T_T2S = where_fun(T_S2B, T_W2B, T_T2W);
@@ -76,10 +76,10 @@ show_frame(trans2pose(T_12S), "g", "1")
 show_frame(trans2pose(T_22S), "c", "2")
 show_frame(trans2pose(T_32S), "m", "3")
 show_frame(trans2pose(T_W2S), "#EDB120", "W")
-DrawJoint(0.03, 0.05, 0.09, [0 0 1]', TableMDH(1,end), P_B) % first joint
-DrawJoint(0.03, 0.05, 0.09, [1 0 0]', TableMDH(1,end)+TableMDH(2,end), P_B) % second joint
-DrawJoint(0.03, 0.05, 0.09, [1 0 0]', TableMDH(1,end)+TableMDH(2,end)+TableMDH(3,end), T_32S(1:3,4)) % third joint
-DrawJoint(0.03, 0.05, 0.09, [1 0 0]', TableMDH(1,end)+TableMDH(2,end)+TableMDH(3,end)+TableMDH(4,end), T_W2S(1:3,4)) % fourth joint
+DrawJoint(0.03, 0.05, 0.09, T_12S) % first joint
+DrawJoint(0.03, 0.05, 0.09, T_22S) % second joint
+DrawJoint(0.03, 0.05, 0.09, T_32S) % third joint
+DrawJoint(0.03, 0.05, 0.09, T_W2S) % fourth joint
 DrawLink(Upper_Arm, T_22S); % first link
 DrawLink(Fore_Arm, T_32S);  % second link
 legend('Station frame', 'Base frame', 'Tool frame', '$1^{st}$ joint frame',...

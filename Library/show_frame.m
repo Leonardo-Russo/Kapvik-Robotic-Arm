@@ -33,6 +33,11 @@ hold on
 linewidth = 1.5;
 arrowhead = linewidth/2;
 
+% Le componenti dei versori dei sistemi di riferimento dei joint hanno le
+% componenti rispetto al riferimento inerziale (station frame, ovvero il
+% sistema di riferimento rispetto a cui è fatto il plot) che sono le righe
+% della rotazione da riferimento inerziale a riferimento di ogni joint (
+% rotazione definita da F
 quiver3(r(1), r(2), r(3), F(1, 1), F(1, 2), F(1, 3), "Color", color, 'LineWidth', linewidth, 'MaxHeadSize', arrowhead);
 quiver3(r(1), r(2), r(3), F(2, 1), F(2, 2), F(2, 3), "Color", color, 'LineWidth', linewidth, 'MaxHeadSize', arrowhead, 'HandleVisibility','off')
 quiver3(r(1), r(2), r(3), F(3, 1), F(3, 2), F(3, 3), "Color", color, 'LineWidth', linewidth, 'MaxHeadSize', arrowhead, 'HandleVisibility','off')
