@@ -94,7 +94,7 @@ T_32S = T_B2S * T_12B * T_221 * T_322;
 T_W23 = tableRow2T(TableMDH(4, :));
 T_W2S = T_B2S * T_12B * T_221 * T_322 * T_W23;
 T_T2W = [eye(3), P_T; 0 0 0 1];
-T_T2S = T_B2S * T_12B * T_221 * T_322 * T_W23 * T_T2W;
+% T_T2S = T_B2S * T_12B * T_221 * T_322 * T_W23 * T_T2W;
 show_frame(trans2pose(T_12S), "g", "1")
 show_frame(trans2pose(T_22S), "c", "2")
 show_frame(trans2pose(T_32S), "m", "3")
