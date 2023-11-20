@@ -1,4 +1,4 @@
-function [T_W2B] = dir_kine(table)
+function [T_W2B] = dirkine(table)
 % Description: This function computes the foward kinematic using
 % the MDH table in input.
 % Inputs:
