@@ -8,6 +8,7 @@ addpath('Library/')
 
 L = 0.7;
 h = 0.3;
+l = 0.1;
 
 %% Define MDH Table
 
@@ -18,7 +19,7 @@ TableMDH = define_table(q1, q2, q3, q4);
 %% Define Station and Base Reference Frames
 
 R_B = eye(3);
-P_B = [0 -0.1 h]';
+P_B = [0 -l h]';
 T_B2S = buildT(R_B, P_B);
 T_S2B = inv_trans(T_B2S);
 
@@ -45,16 +46,21 @@ Joint_3=joint(1.39, 5.3, -150, 110, 1.5*10^(-4), -5*10^(-4));
 Joint_4=joint(0.67, 6.7,  -90,   5, 1.5*10^(-4), -5*10^(-4));
 
 
+%% Testing for Inverse Kinematics
+
+X0 = double(subs(X, [q1, q2, q3, q4], [pi/12 pi/9, -pi/4, pi/4]))
+
+Q = inv_kine_GM(X0, [q1, q2, q3, q4], X)
+
+X1 = double(subs(X, [q1, q2, q3, q4], [Q(1), Q(2), Q(3), Q(4)]))
+
+
 %% Plots
 
 close all
 
 % Compute Necessary Variables
-TableMDH = double(subs(TableMDH, [q1, q2, q3, q4], [pi/12 pi/9, -pi/4, pi/4]));
-show_table(TableMDH)
-T_W2B = dir_kine(TableMDH);
-T_T2S = where_fun(T_S2B, T_W2B, T_T2W);
-X = trans2pose(T_T2S);
+X = double(subs(X, [q1, q2, q3, q4], [pi/12 pi/9, -pi/4, pi/4]));
 
 % Create the Workspace
 figure('name', 'Workspace Test', 'WindowState', 'maximized')

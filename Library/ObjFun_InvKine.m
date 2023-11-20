@@ -12,9 +12,9 @@ function J = ObjFun_InvKine(table, T_S2B, T_T2W, X0)
 % J = cost value
 
 % Compute the new Carthesian State
-[T_W2B] = dir_kine(table);
-[T_T2S] = where_fun(T_S2B, T_W2B, T_T2W);
-[X] = trans2pose(T_T2S);
+T_W2B = dir_kine(table);
+T_T2S = where_fun(T_S2B, T_W2B, T_T2W);
+X = trans2pose(T_T2S);
 
 % Compute Carthesian State Error
 eps = X - X0;
