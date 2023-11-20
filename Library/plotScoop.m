@@ -21,15 +21,15 @@ edgecolor = edgecolor / norm(edgecolor);
 
 % Define the vertices of the box
 % The origin is on the bottom, at the center of one of the short sides
-x = [r(1)+length, r(1)-length, r(1)-length, r(1)+length, r(1)+length, r(1)-length, r(1)-length, r(1)+length];
-y = -[r(2)+length, r(2)+length, r(2)-length, r(2)-length, r(2)+length, r(2)+length, r(2)-length, r(2)-length];
-z = [r(3)+length, r(3)+length, r(3)+length, r(3)+length, r(3)-length, r(3)-length, r(3)-length, r(3)-length];
+x = [r(1)-length, r(1)+length, r(1)+length, r(1)-length, r(1)-length, r(1)+length, r(1)+length, r(1)-length];
+y = [r(2), r(2), r(2)-2*length, r(2)-2*length, r(2), r(2), r(2)-2*length, r(2)-2*length];
+z = [r(3)-length, r(3)-length, r(3)-length, r(3)-length, r(3)+length/3, r(3)+length/3, r(3)+length, r(3)+length];
 % Define the vertices of each face
 faces = [1, 2, 6, 5;    % Front face
          2, 3, 7, 6;    % Right face
          3, 4, 8, 7;    % Back face
          4, 1, 5, 8;    % Left face
-         5, 6, 7, 8];   % Top face
+         1, 2, 3, 4];   % Bottom face
 
 % Plot the Box
 S=patch('Vertices',[x',y',z'], 'Faces',faces, 'FaceColor', facecolor, 'EdgeColor', edgecolor, 'FaceAlpha', 0.55, 'HandleVisibility','off');
