@@ -8,31 +8,34 @@ addpath('Library/')
 
 L = 0.7;
 h = 0.3;
+l = 0.1;
 
 %% Define MDH Table
 
 syms q1 q2 q3 q4 real
 
-TableMDH = define_table(q1, q2, q3, q4);
+TableMDHsym = define_table(q1, q2, q3, q4);
 
 %% Define Station and Base Reference Frames
 
 R_B = eye(3);
-P_B = [0 -0.1 h]';
+P_B = [0 -l h]';
 T_B2S = buildT(R_B, P_B);
 T_S2B = inv_trans(T_B2S);
 
 R_T = eye(3);
+
 P_T = [0.05 0 0]';
+
 T_T2W = buildT(R_T, P_T);
 
 %% Compute Jacobian Matrix
 
-[T_W2B] = simplify(dir_kine(TableMDH));
-[T_T2S] = where_fun(T_S2B, T_W2B, T_T2W);
-X = simplify(trans2pose(T_T2S));
+T_W2Bsym = simplify(dirkine(TableMDHsym));
+T_T2Ssym = where_fun(T_S2B, T_W2Bsym, T_T2W);
+Xsym = simplify(trans2pose(T_T2Ssym));
 
-J = simplify(jacobian(X, [q1 q2 q3 q4]));
+Jsym = simplify(jacobian(Xsym, [q1 q2 q3 q4]));
 
 %% Define links and joints properties
 
@@ -44,16 +47,38 @@ Joint_2=joint(1.28, 8.4,  -90,  90, 1.5*10^(-4), -5*10^(-4));
 Joint_3=joint(1.39, 5.3, -150, 110, 1.5*10^(-4), -5*10^(-4));
 Joint_4=joint(0.67, 6.7,  -90,   5, 1.5*10^(-4), -5*10^(-4));
 
+
+
+%% Testing for Inverse Kinematics
+
+X0 = double(subs(Xsym, [q1, q2, q3, q4], [pi/12 pi/9, -pi/4, pi/4]));
+
+tic
+Q = invkine(X0, [q1, q2, q3, q4], Xsym);
+stopwatch = toc;
+
+X1 = double(subs(Xsym, [q1, q2, q3, q4], [Q(1), Q(2), Q(3), Q(4)]));
+
+fprintf('\nThe desired pose was:\n [%.4f \t%.4f \t%.4f \t%.4f \t%.4f \t%.4f]\n', X0(:))
+fprintf('\nThe retrieved joint variables yield this new pose:\n [%.4f \t%.4f \t%.4f \t%.4f \t%.4f \t%.4f]\n', X1(:))
+fprintf('\nThe time required was: %.2f s\n', stopwatch)
+
 %% Plots
 
 close all
 
+% Set the Joint Variables
+Q = [pi/12 pi/9, -pi/4, pi/4];
+
 % Compute Necessary Variables
-X = double(subs(X, [q1, q2, q3, q4], [pi/12 pi/9, -pi/4, pi/4]));
-TableMDH = double(subs(TableMDH, [q1, q2, q3, q4], [pi/12 pi/9, -pi/4, pi/4]));
+
+TableMDH = double(subs(TableMDHsym, [q1, q2, q3, q4], [Q(1), Q(2), Q(3), Q(4)]));
+T_W2B = double(subs(T_W2Bsym, [q1, q2, q3, q4], [Q(1), Q(2), Q(3), Q(4)]));
+T_T2S = double(subs(T_T2Ssym, [q1, q2, q3, q4], [Q(1), Q(2), Q(3), Q(4)]));
+X = double(subs(Xsym, [q1, q2, q3, q4], [Q(1), Q(2), Q(3), Q(4)]));
 
 % Create the Workspace
-figure('name', 'Workspace Test')
+figure('name', 'Workspace Test', 'WindowState', 'maximized')
 show_frame(zeros(6, 1), 'k', "S")                   % Station frame
 show_frame([P_B; zeros(3, 1)], '#2b31ed', "B")      % Base frame
 show_frame(X, '#e84f1c', "T")                       % Tool frame
@@ -84,3 +109,4 @@ plotScoop(P_T(1), T_12S, T_22S, T_W2S) % Scoop
 legend('Station frame', 'Base frame', 'Tool frame', '$1^{st}$ joint frame',...
     '$2^{nd}$ joint frame', '$3^{rd}$ joint frame', '$4^{th}$ joint frame (wrist frame)',...
     'fontsize', 12,'Interpreter', 'latex')
+
