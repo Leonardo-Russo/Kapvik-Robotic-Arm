@@ -23,7 +23,7 @@ T_B2S = buildT(R_B, P_B);
 T_S2B = inv_trans(T_B2S);
 
 R_T = eye(3);
-P_T = [0.1 0 0]';
+P_T = [0 0 0]';
 T_T2W = buildT(R_T, P_T);
 
 %% Compute Jacobian Matrix
@@ -57,7 +57,7 @@ T_T2S = where_fun(T_S2B, T_W2B, T_T2W);
 X = trans2pose(T_T2S);
 
 % Create the Workspace
-figure('name', 'Workspace Test')
+figure('name', 'Workspace Test', 'WindowState', 'maximized')
 show_frame(zeros(6, 1), 'k', "S")                   % Station frame
 show_frame([P_B; zeros(3, 1)], '#2b31ed', "B")      % Base frame
 show_frame(X, '#e84f1c', "T")                       % Tool frame
@@ -85,3 +85,42 @@ DrawLink(Fore_Arm, T_32S);  % second link
 legend('Station frame', 'Base frame', 'Tool frame', '$1^{st}$ joint frame',...
     '$2^{nd}$ joint frame', '$3^{rd}$ joint frame', '$4^{th}$ joint frame (wrist frame)',...
     'fontsize', 12,'Interpreter', 'latex')
+
+
+%% Test 201241i23y1
+
+I = eye(3);
+
+X_T = trans2pose(T_W2S);
+
+roll = rad2deg(X(4))
+pitch = rad2deg(X(5))
+yaw = rad2deg(X(6))
+
+% I = R3(X(6))*I;
+% I = R2(X(5))*I;
+% I = R1(X(4))*I;
+
+I = R3(15, "deg")*I;
+I = R2(-20, "deg")*I;
+I = R1(90, "deg")*I;
+
+yaw = q1;
+
+pitch = q2 + q3 + q4;
+
+roll = pi/2;
+
+
+% show_frame(trans2pose(buildT(I, zeros(3, 1))), '#a83232');
+
+
+% show_frame(trans2pose(buildT(I, zeros(3, 1))), '#a83232');
+
+
+show_frame(trans2pose(buildT(I', [0.802717233896431, 0.115087434573093, 0.271377230763900]')), '#a83232');
+
+
+%%
+
+inv_kine_anal()
