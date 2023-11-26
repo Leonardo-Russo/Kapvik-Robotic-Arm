@@ -27,6 +27,6 @@ function [f, n, tau] = jointForcesTorques(R, fEnd, nEnd, F, N, P, Pc, z)
 
 f=R*fEnd+F;
 n=N+R*nEnd+cross(Pc,F)+cross(P,R*fEnd);
-tau=n'*z;
+tau=dot(n,z);
 
 end
