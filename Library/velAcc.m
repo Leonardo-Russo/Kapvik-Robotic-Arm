@@ -1,11 +1,11 @@
-function [omega, omegad, vd, vcd] = velAcc(R, omega0, omega0Dot, qd, qdd, v0d, z, P, Pc)
+function [omega, omegad, vd, vcd] = velAcc(R, omega0, omega0d, qd, qdd, v0d, z, P, Pc)
 % This function computes linear and angular velocities and their
 % derivatives for each link:
 % INPUT:
 % R = rotation matrix from reference frame i to reference frame i+1
 % omega0 = angular velocity of reference frame i wrt base frame, expressed
 %          in the reference frame i
-% omega0 = derivative of angular velocity of reference frame i  wrt base frame,
+% omega0d = derivative of angular velocity of reference frame i  wrt base frame,
 %          expressed in the reference frame i
 % qd = angular rate of joint variable i+1
 % qdd = derivative of angular rate of joint variable i+1
@@ -26,8 +26,8 @@ function [omega, omegad, vd, vcd] = velAcc(R, omega0, omega0Dot, qd, qdd, v0d, z
 %         the reference frame i+1
 
 omega=R*omega0+qd*z;
-omegad=R*omega0Dot+R*cross(omega0,qd*z)+qdd*z;
-vd=R*(cross(omega0Dot,P)+cross(omega0,cross(omega0,P))+v0d);
+omegad=R*omega0d+R*cross(omega0,qd*z)+qdd*z;
+vd=R*(cross(omega0d,P)+cross(omega0,cross(omega0,P))+v0d);
 vcd=cross(omegad,Pc)+cross(omega,cross(omega,Pc))+vd;
 
 end
