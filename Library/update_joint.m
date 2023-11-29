@@ -1,14 +1,16 @@
 function update_joint(joint, T)
 
-global inner_diameter outer_diameter Length
+Di = joint.Di;
+Do = joint.Do;
+L = joint.L;
 
 % Update Core
-[xx_outer, yy_outer, zz_outer, ~] = create_cylinder(outer_diameter, Length, T);
+[xx_outer, yy_outer, zz_outer, ~] = create_cylinder(Do, L, T);
 set(joint.core, 'XData', xx_outer, 'YData', yy_outer, 'ZData', zz_outer);
 
 % Regenerate Caps
-[~, ~, ~, caps_outer] = create_cylinder(outer_diameter, Length, T);
-[~, ~, ~, caps_inner] = create_cylinder(inner_diameter, Length, T);
+[~, ~, ~, caps_outer] = create_cylinder(Do, L, T);
+[~, ~, ~, caps_inner] = create_cylinder(Di, L, T);
 
 % Update Caps
 update_caps(joint.outcaps, caps_outer, caps_inner);

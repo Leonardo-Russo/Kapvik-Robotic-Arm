@@ -128,10 +128,9 @@ jframes = show_jointframes(X_1, X_2, X_3);
 
 joints = show_joints(T_12S, T_22S, T_32S, T_W2S);
 
-DrawLink(Upper_Arm, T_22S); % first link
-DrawLink(Fore_Arm, T_32S);  % second link
+links = show_links(Upper_Arm, T_22S, Fore_Arm, T_32S);
 
-plotScoop(scoopLength, T_12S, T_22S, T_W2S) % Scoop
+scoop = plotScoop(scoopLength, T_12S, T_22S, T_W2S);
 
 axis equal
 
@@ -143,16 +142,10 @@ axis equal
 %     '$2^{nd}$ joint frame', '$3^{rd}$ joint frame', '$4^{th}$ joint frame (wrist frame)',...
 %     'fontsize', 12,'Interpreter', 'latex')
 
-%%
+%% Live Update Tests
 
 X_Snew = [1 1 1 0 pi 0]';
 update_frame(mframes.S, X_Snew)
-
-global inner_diameter outer_diameter Length
-inner_diameter = 0.05;
-outer_diameter = 0.07;
-Length = 0.18;
-
 
 T_12S(1, 4) = 1;
 update_joint(joints.J1, T_12S);

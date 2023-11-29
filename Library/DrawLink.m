@@ -1,4 +1,4 @@
-function Body = DrawLink(Link, T, color)
+function link = DrawLink(Link, T, color)
 % Description: this function draws a link in 3D space.
 % 
 % Inputs:
@@ -59,10 +59,9 @@ endcap_bot_z = zz(2, :);
 top = fill3(endcap_top_x, endcap_top_y, endcap_top_z, color, 'EdgeColor','none', 'HandleVisibility','off');
 bot = fill3(endcap_bot_x, endcap_bot_y, endcap_bot_z, color, 'EdgeColor','none', 'HandleVisibility','off');
 
-% Body = struct('name', "Cylinder Link");
-% Body.surfs = [core, top, bot];
-% 
-% angles = [roll, pitch, yaw];
-% rotate_body(Body, angles, x0 , y0, z0)
+link = struct('name', 'Link');
+link.core = core;
+link.top = top;
+link.bot = bot;
 
 end
