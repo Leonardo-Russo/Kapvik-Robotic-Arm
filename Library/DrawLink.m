@@ -1,9 +1,15 @@
-function Body = DrawLink(Link, T)
+function Body = DrawLink(Link, T, color)
 % Description: this function draws a link in 3D space.
 % 
 % Inputs:
 % Link = link object
 % T = link's associated joint transformation matrix
+
+light_orange = [0.950, 0.5250, 0.0980];
+
+if nargin < 3
+    color = light_orange;
+end
 
 % Retrieve the Dimensions
 D = Link.Diameter * 1e-3;
@@ -38,7 +44,7 @@ yy = y0+reshape(rotated_points(2,:), size(yy));
 zz = z0+reshape(rotated_points(3,:), size(zz));
 
 % Plot the Cylinder
-core = surf(xx, yy, zz, 'EdgeColor', 'none', 'HandleVisibility','off');
+core = surf(xx, yy, zz, 'EdgeColor', 'none', 'HandleVisibility','off', 'FaceColor', color);
 
 % Compute the End Caps Coordinates
 endcap_top_x = xx(1, :);
@@ -50,8 +56,8 @@ endcap_bot_y = yy(2, :);
 endcap_bot_z = zz(2, :);
 
 % Draw the End Caps
-top = fill3(endcap_top_x, endcap_top_y, endcap_top_z, 'y', 'EdgeColor','none', 'HandleVisibility','off');
-bot = fill3(endcap_bot_x, endcap_bot_y, endcap_bot_z, 'y', 'EdgeColor','none', 'HandleVisibility','off');
+top = fill3(endcap_top_x, endcap_top_y, endcap_top_z, color, 'EdgeColor','none', 'HandleVisibility','off');
+bot = fill3(endcap_bot_x, endcap_bot_y, endcap_bot_z, color, 'EdgeColor','none', 'HandleVisibility','off');
 
 % Body = struct('name', "Cylinder Link");
 % Body.surfs = [core, top, bot];

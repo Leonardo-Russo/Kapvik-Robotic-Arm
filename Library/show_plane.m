@@ -1,4 +1,4 @@
-function show_plane(u, v, p, size, color)
+function terrain = show_plane(u, v, p, size, color)
 % Description: this function draws the plane defined by the input vectors
 % u and v at point P.
 
@@ -22,6 +22,6 @@ X = x1 + u(1)*P + v(1)*Q;
 Y = y1 + u(2)*P + v(2)*Q; 
 Z = z1 + u(3)*P + v(3)*Q;
 
-surf(X,Y,Z, 'FaceColor', color, 'FaceAlpha', 0.25, 'EdgeAlpha', 0.25, 'HandleVisibility','off')
+terrain = surf(X,Y,Z, 'FaceColor', color, 'FaceAlpha', 0.25, 'EdgeAlpha', 0.25, 'HandleVisibility','off');
 
 end
