@@ -10,11 +10,21 @@ L = 0.7;
 h = 0.3;
 l = 0.1;
 
+%% Define links and joints properties
+
+Upper_Arm=link(0.46, 40, 2, 3.5);
+Fore_Arm=link(0.44, 40, 2, 3.5);
+
+Joint_1=joint(1.15, 8.4, -160, 100, 1.5*10^(-4), -5*10^(-4));
+Joint_2=joint(1.28, 8.4,  -90,  90, 1.5*10^(-4), -5*10^(-4));
+Joint_3=joint(1.39, 5.3, -150, 110, 1.5*10^(-4), -5*10^(-4));
+Joint_4=joint(0.67, 6.7,  -90,   5, 1.5*10^(-4), -5*10^(-4));
+
 %% Define MDH Table
 
 syms q1 q2 q3 q4 q1d q2d q3d q4d q1dd q2dd q3dd q4dd g real
 
-TableMDHsym = define_table(q1, q2, q3, q4);
+TableMDHsym = define_table(q1, q2, q3, q4, 1.5*10^(-3)*Upper_Arm.Diameter);
 
 %% Define Station and Base Reference Frames
 
@@ -36,17 +46,6 @@ T_T2Ssym = where_fun(T_S2B, T_W2Bsym, T_T2W);
 Xsym = simplify(trans2pose(T_T2Ssym));
 
 Jsym = simplify(jacobian(Xsym, [q1 q2 q3 q4]));
-
-%% Define links and joints properties
-
-Upper_Arm=link(0.46, 40, 2, 3.5);
-Fore_Arm=link(0.44, 40, 2, 3.5);
-
-Joint_1=joint(1.15, 8.4, -160, 100, 1.5*10^(-4), -5*10^(-4));
-Joint_2=joint(1.28, 8.4,  -90,  90, 1.5*10^(-4), -5*10^(-4));
-Joint_3=joint(1.39, 5.3, -150, 110, 1.5*10^(-4), -5*10^(-4));
-Joint_4=joint(0.67, 6.7,  -90,   5, 1.5*10^(-4), -5*10^(-4));
-
 
 
 % %% Testing for Inverse Kinematics
@@ -99,10 +98,10 @@ show_frame(trans2pose(T_12S), "g", "1")
 show_frame(trans2pose(T_22S), "c", "2")
 show_frame(trans2pose(T_32S), "m", "3")
 show_frame(trans2pose(T_W2S), "#EDB120", "W")
-DrawJoint(0.03, 0.05, 0.1, T_12S) % first joint
-DrawJoint(0.03, 0.05, 0.1, T_22S) % second joint
-DrawJoint(0.03, 0.05, 0.1, T_32S) % third joint
-DrawJoint(0.03, 0.05, 0.1, T_W2S) % fourth joint
+DrawJoint(0.05, 0.07, 0.18, T_12S) % first joint
+DrawJoint(0.05, 0.07, 0.18, T_22S) % second joint
+DrawJoint(0.05, 0.07, 0.18, T_32S) % third joint
+DrawJoint(0.05, 0.07, 0.18, T_W2S) % fourth joint
 DrawLink(Upper_Arm, T_22S); % first link
 DrawLink(Fore_Arm, T_32S);  % second link
 plotScoop(P_T(1), T_12S, T_22S, T_W2S) % Scoop

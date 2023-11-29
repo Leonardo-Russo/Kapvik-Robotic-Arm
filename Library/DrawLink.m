@@ -7,7 +7,7 @@ function Body = DrawLink(Link, T)
 
 % Retrieve the Dimensions
 D = Link.Diameter * 1e-3;
-r = D/2;
+r = D*1.2/2;
 L = Link.Length;
 
 % Retrieve the Pose
