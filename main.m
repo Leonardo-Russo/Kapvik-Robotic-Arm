@@ -6,11 +6,9 @@ clc
 
 addpath('Library/')
 
+options = struct('name', "Options");
+options.show_frames = true;
 
-% To Do's:
-% - aggiungi la luce
-% - fai la leggenda con il toggle
-% - cambia show_frame in modo che accetti anche la matrice di transformazione
 
 %% Define links and joints properties
 
@@ -85,11 +83,11 @@ Jsym = simplify(jacobian(X_Tsym, [q1 q2 q3 q4]));
 % fprintf('\nThe retrieved joint variables yield this new pose:\n [%.4f \t%.4f \t%.4f \t%.4f \t%.4f \t%.4f]\n', X1(:))
 % fprintf('\nThe time required was: %.2f s\n', stopwatch)
 
-%% Plots
+%% Plot Initial Condition
 
 close all
 
-% Set the Joint Variables
+% Set the Initial Joint Variables
 Q = [pi/12 pi/9, -pi/4, pi/4];
 
 % Compute Necessary Variables
@@ -120,32 +118,105 @@ X_3 = trans2pose(T_32S);
 % Create the Workspace
 figure('name', 'Enviroment Simulation')
 
+% Add toggle button for Legend
+toggleButton = uicontrol('Style', 'pushbutton', 'String', 'Show Legend', 'Position', [20 20 100 20]);
+
 env = show_env(L, w, h);
-
-mframes = show_mainframes(X_S, X_B, X_W, X_T);
-
-jframes = show_jointframes(X_1, X_2, X_3);
-
 joints = show_joints(T_12S, T_22S, T_32S, T_W2S);
-
 links = show_links(Upper_Arm, T_22S, Fore_Arm, T_32S);
-
 scoop = plotScoop(scoopLength, T_12S, T_22S, T_W2S);
+
+if options.show_frames
+    mframes = show_mainframes(X_S, X_B, X_W, X_T);
+    jframes = show_jointframes(X_1, X_2, X_3);
+end
 
 axis equal
 
-% % Add Ligthing
-% light('Position', [-1, -1, 1])
-% lighting gouraud
+% Choose Material: [ambient, diffuse, specular, shininess, specularExponent]
+material([0.5, 0.6, 0.6, 0, 0.2]);
 
-% legend('Station frame', 'Base frame', 'Tool frame', '$1^{st}$ joint frame',...
-%     '$2^{nd}$ joint frame', '$3^{rd}$ joint frame', '$4^{th}$ joint frame (wrist frame)',...
-%     'fontsize', 12,'Interpreter', 'latex')
+% Set Light
+light('Position', [2 2 5], 'Style', 'local');
+lightangle(150, 40);
+lighting gouraud
 
-%% Live Update Tests
+if options.show_frames
+    lgd = legend([mframes.S.arw1, mframes.B.arw1, mframes.W.arw1, mframes.T.arw1, jframes.J1.arw1, jframes.J2.arw1, jframes.J3.arw1], ...
+                 {'Station Frame', 'Base Frame', 'Wrist Frame', 'Tool Frame', ...
+                  '1^{st} Joint Frame', '2^{nd} Joint Frame', '3^{rd} Joint Frame'}, ...
+                  'location', 'best', 'fontsize', 8);
+    
+    set(lgd, 'Visible', 'off');     % by default legend is hidden
 
-X_Snew = [1 1 1 0 pi 0]';
-update_frame(mframes.S, X_Snew)
+    % Set the callback for the button
+    set(toggleButton, 'Callback', {@toggleLegendCallback, lgd});
 
-T_12S(1, 4) = 1;
-update_joint(joints.J1, T_12S);
+end
+
+
+%% Plot Live Evolution
+
+% Set the Joint Variables
+N = 100;
+q1_span = linspace(pi/12, pi/3, N)';
+q2_span = linspace(pi/9, pi/3, N)';
+q3_span = linspace(-pi/4, -pi/3, N)';
+
+input('Press Enter to Start the Simulation...\n');
+
+for i = 1 : N
+
+    Q = [q1_span(i) q2_span(i), q3_span(i), pi/4];
+
+    % Compute Necessary Variables
+    TableMDH = double(subs(TableMDHsym, [q1, q2, q3, q4], [Q(1), Q(2), Q(3), Q(4)]));
+    T_W2B = double(subs(T_W2Bsym, [q1, q2, q3, q4], [Q(1), Q(2), Q(3), Q(4)]));
+    T_T2S = double(subs(T_T2Ssym, [q1, q2, q3, q4], [Q(1), Q(2), Q(3), Q(4)]));
+    X_T = double(subs(X_Tsym, [q1, q2, q3, q4], [Q(1), Q(2), Q(3), Q(4)]));
+
+    T_12B = tableRow2T(TableMDH(1, :));
+    T_12S = T_B2S * T_12B;
+    T_221 = tableRow2T(TableMDH(2, :));
+    T_22S = T_B2S * T_12B * T_221;
+    T_322 = tableRow2T(TableMDH(3, :));
+    T_32S = T_B2S * T_12B * T_221 * T_322;
+    T_W23 = tableRow2T(TableMDH(4, :));
+    T_W2S = T_B2S * T_12B * T_221 * T_322 * T_W23;
+    T_T2W = [eye(3), P_T; 0 0 0 1];
+    % T_T2S = T_B2S * T_12B * T_221 * T_322 * T_W23 * T_T2W;
+
+    X_S = zeros(6, 1);
+    X_B = trans2pose(T_B2S);
+    X_W = trans2pose(T_W2S);
+
+    X_1 = trans2pose(T_12S);
+    X_2 = trans2pose(T_22S);
+    X_3 = trans2pose(T_32S);
+
+
+    % Update the Plot
+    update_joint(joints.J1, T_12S);
+    update_joint(joints.J2, T_22S);
+    update_joint(joints.J3, T_32S);
+    update_joint(joints.J4, T_W2S);
+
+    update_link(links.arm, T_22S, Upper_Arm);
+    update_link(links.forearm, T_32S, Fore_Arm);
+
+    update_scoop(scoop, scoopLength, T_W2S, T_12S, T_22S);
+
+    if options.show_frames
+        update_frame(mframes.S, X_S);
+        update_frame(mframes.B, X_B);
+        update_frame(mframes.W, X_W);
+        update_frame(mframes.T, X_T);
+
+        update_frame(jframes.J1, X_1);
+        update_frame(jframes.J2, X_2);
+        update_frame(jframes.J3, X_3);
+    end
+
+    pause(1/N)
+
+end

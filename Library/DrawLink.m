@@ -4,8 +4,13 @@ function link = DrawLink(Link, T, color)
 % Inputs:
 % Link = link object
 % T = link's associated joint transformation matrix
+% color = link color
+% 
+% Outputs:
+% 
+% link = structure with each figure element for the link
 
-light_orange = [0.950, 0.5250, 0.0980];
+light_orange = [0.8902    0.4230    0.1692];
 
 if nargin < 3
     color = light_orange;
