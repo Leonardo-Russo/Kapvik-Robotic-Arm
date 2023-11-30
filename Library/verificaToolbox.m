@@ -11,7 +11,7 @@ theta3=0; %[rad]
 theta4=0; %[rad]
 robot = SerialLink( [RevoluteMDH('alpha',0,'a',0,'d',0)...
     RevoluteMDH('alpha',pi/2,'a',0,'d',0) RevoluteMDH('alpha',0,'a',a2,'d',0)...
-    RevoluteMDH('alpha',0,'a',a3,'d',0)], 'name', '2-link');
+    RevoluteMDH('alpha',0,'a',a3,'d',0)], 'name', 'TeamWork robot');
 robot.teach([theta1 theta2 theta3 theta4]);
 
 %% Cinematica diretta
