@@ -1,8 +1,8 @@
-function plotScoop(length, T_12S, T_22S, T_W2S, facecolor)
+function S = plotScoop(length, T_12S, T_22S, T_W2S, facecolor)
 % Description: this function draws a box in 3D space. The reference frame
 % is coherent with the choice of station frame in this case study.
 
-if nargin < 7
+if nargin < 5
     facecolor = [219, 219, 219];
     facecolor = facecolor / norm(facecolor);
 end

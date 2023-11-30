@@ -1,4 +1,4 @@
-function plot3DBox(length, width, height, facecolor)
+function box = plot3DBox(length, width, height, facecolor)
 % Description: this function draws a box in 3D space. The reference frame
 % is coherent with the choice of station frame in this case study.
 
@@ -24,6 +24,6 @@ faces = [1, 2, 6, 5;    % Front face
          5, 6, 7, 8];   % Top face
 
 % Plot the Box
-patch('Vertices',[x',y',z'], 'Faces',faces, 'FaceColor', facecolor, 'EdgeColor', edgecolor, 'FaceAlpha', 0.55, 'HandleVisibility','off');
+box = patch('Vertices',[x',y',z'], 'Faces',faces, 'FaceColor', facecolor, 'EdgeColor', edgecolor, 'FaceAlpha', 0.55, 'HandleVisibility','off');
 
 end
