@@ -9,7 +9,7 @@ function [f, n, tau] = jointForcesTorques(R, fEnd, nEnd, F, N, P, Pc, z)
 %     reference frame i (computed as a function of v and omega)
 % N = external torques wrt the CDM of link i, expressed in the
 %     reference frame i (computed as a function of v and omega)
-% omegaDot = derivative of angular velocity of reference frame  i+1 wrt base
+% omegaD = derivative of angular velocity of reference frame  i+1 wrt base
 %            frame expressed in the reference frame i+1
 % P = position of reference frame i+1 wrt reference frame i, expressed in 
 %     the reference frame i 
