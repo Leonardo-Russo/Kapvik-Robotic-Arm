@@ -120,6 +120,7 @@ figure('name', 'Enviroment Simulation')
 
 % Add toggle button for Legend
 toggleButton = uicontrol('Style', 'pushbutton', 'String', 'Show Legend', 'Position', [20 20 100 20]);
+boringButton = uicontrol('Style', 'pushbutton', 'String', 'Boring Button', 'Position', [140 20 100 20]);
 
 env = show_env(L, w, h);
 joints = show_joints(T_12S, T_22S, T_32S, T_W2S);
@@ -137,7 +138,7 @@ axis equal
 material([0.5, 0.6, 0.6, 0, 0.2]);
 
 % Set Light
-light('Position', [2 2 5], 'Style', 'local');
+lgt = light('Position', [2 2 5], 'Style', 'local');
 lightangle(150, 40);
 lighting gouraud
 
@@ -149,10 +150,12 @@ if options.show_frames
     
     set(lgd, 'Visible', 'off');     % by default legend is hidden
 
-    % Set the callback for the button
+    % Set the callback for the buttons
     set(toggleButton, 'Callback', {@toggleLegendCallback, lgd});
 
 end
+
+set(boringButton, 'Callback', {@strobEffectCallback, lgt});
 
 
 %% Plot Live Evolution
