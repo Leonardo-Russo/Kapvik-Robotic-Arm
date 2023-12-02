@@ -217,6 +217,6 @@ for i = 1 : N
         update_frame(jframes.J3, X_3);
     end
 
-    pause(1/N)
+    pause(1/(1000*N))
 
 end
