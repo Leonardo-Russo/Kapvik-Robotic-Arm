@@ -118,21 +118,22 @@ X_3 = trans2pose(T_32S);
 % Create the Workspace
 figure('name', 'Enviroment Simulation')
 
-% Add toggle button for Legend
-toggleButton = uicontrol('Style', 'pushbutton', 'String', 'Show Legend', 'Position', [20 20 100 20]);
+% Add toggle buttons
 boringButton = uicontrol('Style', 'pushbutton', 'String', 'Boring Button', 'Position', [140 20 100 20]);
 
 env = show_env(L, w, h);
 joints = show_joints(T_12S, T_22S, T_32S, T_W2S);
 links = show_links(Upper_Arm, T_22S, Fore_Arm, T_32S);
-scoop = plotScoop(scoopLength, T_12S, T_22S, T_W2S);
 
 if options.show_frames
     mframes = show_mainframes(X_S, X_B, X_W, X_T);
     jframes = show_jointframes(X_1, X_2, X_3);
+    toggleButton = uicontrol('Style', 'pushbutton', 'String', 'Show Legend', 'Position', [20 20 100 20]);
 end
 
 axis equal
+
+scoop = plotScoop(scoopLength, T_12S, T_22S, T_W2S);
 
 % Choose Material: [ambient, diffuse, specular, shininess, specularExponent]
 material([0.5, 0.6, 0.6, 0, 0.2]);
@@ -157,16 +158,16 @@ end
 
 set(boringButton, 'Callback', {@strobEffectCallback, lgt});
 
-
+return
 %% Plot Live Evolution
 
 % Set the Joint Variables
-N = 100;
+N = 10;
 q1_span = linspace(pi/12, pi/3, N)';
 q2_span = linspace(pi/9, pi/3, N)';
 q3_span = linspace(-pi/4, -pi/3, N)';
 
-input('Press Enter to Start the Simulation...\n');
+% input('Press Enter to Start the Simulation...\n');
 
 for i = 1 : N
 

@@ -32,9 +32,9 @@ faces = [1, 2, 6, 5;    % Front face
          1, 2, 3, 4];   % Bottom face
 
 % Plot the Box
-S=patch('Vertices',[x',y',z'], 'Faces',faces, 'FaceColor', facecolor, 'EdgeColor', edgecolor, 'FaceAlpha', 0.55, 'HandleVisibility','off');
-rotate (S, [0 0 1], yaw, T_W2S(1:3,4));
-rotate (S, T_12S(1:3,2), pitch, T_W2S(1:3,4));
-rotate (S, T_22S(1:3,2), roll, T_W2S(1:3,4));
+S = patch('Vertices',[x',y',z'], 'Faces',faces, 'FaceColor', facecolor, 'EdgeColor', edgecolor, 'FaceAlpha', 0.55, 'HandleVisibility','off');
+rotate(S, [0 0 1], yaw, T_W2S(1:3,4));
+rotate(S, T_12S(1:3,2), pitch, T_W2S(1:3,4));
+rotate(S, T_22S(1:3,2), roll, T_W2S(1:3,4));
 
 end

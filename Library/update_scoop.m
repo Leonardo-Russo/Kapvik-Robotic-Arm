@@ -18,8 +18,8 @@ z = [r(3)-length, r(3)-length, r(3)-length, r(3)-length, r(3)+length/3, r(3)+len
 set(S, 'Vertices', [x', y', z']);
 
 % Apply rotations
-rotate (S, [0 0 1], yaw, T_W2S(1:3,4));
-rotate (S, T_12S(1:3,2), pitch, T_W2S(1:3,4));
-rotate (S, T_22S(1:3,2), roll, T_W2S(1:3,4));
+rotate(S, [0 0 1], yaw, T_W2S(1:3, 4));
+rotate(S, T_12S(1:3, 2), pitch, T_W2S(1:3, 4));
+rotate(S, T_22S(1:3, 2), roll, T_W2S(1:3, 4));
 
 end
