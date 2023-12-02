@@ -31,10 +31,19 @@ faces = [1, 2, 6, 5;    % Front face
          4, 1, 5, 8;    % Left face
          1, 2, 3, 4];   % Bottom face
 
+% R = R1(roll,"deg")*R2(pitch,"deg")*R3(yaw,"deg");
+% for i=1:8
+%     newR=R*[x(i) y(i) z(i)]';
+%     rx(i)=newR(1);
+%     ry(i)=newR(2);
+%     rz(i)=newR(3);
+% end
+
 % Plot the Box
-S=patch('Vertices',[x',y',z'], 'Faces',faces, 'FaceColor', facecolor, 'EdgeColor', edgecolor, 'FaceAlpha', 0.55, 'HandleVisibility','off');
+S=patch('Vertices',[rx',ry',rz'], 'Faces',faces, 'FaceColor', facecolor, 'EdgeColor', edgecolor, 'FaceAlpha', 0.55, 'HandleVisibility','off');
 rotate (S, [0 0 1], yaw, T_W2S(1:3,4));
 rotate (S, T_12S(1:3,2), pitch, T_W2S(1:3,4));
 rotate (S, T_22S(1:3,2), roll, T_W2S(1:3,4));
+
 
 end

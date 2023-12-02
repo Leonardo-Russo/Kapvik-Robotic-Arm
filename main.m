@@ -164,6 +164,7 @@ end
 %% Plot Live Evolution
 
 % Set the Joint Variables
+
 % N = 100;
 % q1_span = linspace(pi/12, pi/3, N)';
 % q2_span = linspace(pi/9, pi/3, N)';
