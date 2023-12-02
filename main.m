@@ -70,25 +70,31 @@ Jsym = simplify(jacobian(X_Tsym, [q1 q2 q3 q4]));
 
 
 % %% Testing for Inverse Kinematics
-% 
+
 % X0 = double(subs(Xsym, [q1, q2, q3, q4], [pi/12 pi/9, -pi/4, pi/4]));
-% 
-% tic
-% Q = invkine(X0, [q1, q2, q3, q4], Xsym);
-% stopwatch = toc;
-% 
-% X1 = double(subs(Xsym, [q1, q2, q3, q4], [Q(1), Q(2), Q(3), Q(4)]));
-% 
-% fprintf('\nThe desired pose was:\n [%.4f \t%.4f \t%.4f \t%.4f \t%.4f \t%.4f]\n', X0(:))
-% fprintf('\nThe retrieved joint variables yield this new pose:\n [%.4f \t%.4f \t%.4f \t%.4f \t%.4f \t%.4f]\n', X1(:))
-% fprintf('\nThe time required was: %.2f s\n', stopwatch)
+% X0 = [0.8 ,	0 ,	0.8 , 1.5708 ,	0.1543 ,	0.1988]
+X0 = [0.8 ,	0 ,	0.8]
+%[0.1988 	0.8692 	-0.4873 	-0.5363]
+%[0.1988 	0.2941 	0.6306 	-0.7704]
+
+tic
+Qinv = invkine(X0, [q1, q2, q3, q4], X_Tsym);
+stopwatch = toc;
+
+X1 = double(subs(X_Tsym, [q1, q2, q3, q4], [Qinv(1), Qinv(2), Qinv(3), Qinv(4)]));
+
+fprintf('\nThe desired pose was:\n [%.4f \t%.4f \t%.4f \t%.4f \t%.4f \t%.4f]\n', X0(:))
+fprintf('\nThe joint variables are:\n [%.4f \t%.4f \t%.4f \t%.4f]\n', Qinv(:))
+fprintf('\nThe retrieved joint variables yield this new pose:\n [%.4f \t%.4f \t%.4f \t%.4f \t%.4f \t%.4f]\n', X1(:))
+fprintf('\nThe time required was: %.2f s\n', stopwatch)
 
 %% Plot Initial Condition
 
 close all
 
 % Set the Initial Joint Variables
-Q = [pi/12 pi/9, -pi/4, pi/4];
+% Q = [pi/12 pi/9, -pi/4, pi/4];
+Q = Qinv;
 
 % Compute Necessary Variables
 TableMDH = double(subs(TableMDHsym, [q1, q2, q3, q4], [Q(1), Q(2), Q(3), Q(4)]));
@@ -158,8 +164,10 @@ end
 
 set(boringButton, 'Callback', {@strobEffectCallback, lgt});
 
+
 return
-%% Plot Live Evolution
+
+%% Plot Live Evolution - Skipped for now...
 
 % Set the Joint Variables
 N = 10;
@@ -167,7 +175,7 @@ q1_span = linspace(pi/12, pi/3, N)';
 q2_span = linspace(pi/9, pi/3, N)';
 q3_span = linspace(-pi/4, -pi/3, N)';
 
-% input('Press Enter to Start the Simulation...\n');
+input('Press Enter to Start the Simulation...\n');
 
 for i = 1 : N
 
