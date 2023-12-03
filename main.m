@@ -69,16 +69,17 @@ X_Tsym = simplify(trans2pose(T_T2Ssym));
 Jsym = simplify(jacobian(X_Tsym, [q1 q2 q3 q4]));
 
 
-% %% Testing for Inverse Kinematics
+%% Testing for Inverse Kinematics
 
-% X0 = double(subs(Xsym, [q1, q2, q3, q4], [pi/12 pi/9, -pi/4, pi/4]));
+X0 = double(subs(X_Tsym, [q1, q2, q3, q4], [pi/12 pi/9, -pi/4, pi/4]));
 % X0 = [0.8 ,	0 ,	0.8 , 1.5708 ,	0.1543 ,	0.1988]
-X0 = [0.8 ,	0 ,	0.8]
+% X0 = [0.8 ,	0 ,	0.8]
 %[0.1988 	0.8692 	-0.4873 	-0.5363]
 %[0.1988 	0.2941 	0.6306 	-0.7704]
 
 tic
-Qinv = invkine(X0, [q1, q2, q3, q4], X_Tsym);
+% Qinv = invkine(X0, [q1, q2, q3, q4], X_Tsym);
+Qinv = invkineLEO(X0, [q1, q2, q3, q4], X_Tsym, a2, a3);
 stopwatch = toc;
 
 X1 = double(subs(X_Tsym, [q1, q2, q3, q4], [Qinv(1), Qinv(2), Qinv(3), Qinv(4)]));
