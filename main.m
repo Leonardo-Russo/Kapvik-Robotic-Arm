@@ -21,11 +21,12 @@ h = 0.3;                % m
 P_By = 0.1;             % m
 
 % Scoop Dimension
-scoopLength = 0.08;      % m
+scoopLength = 0.05;      % m
 
 % Other Parameters
 a2 = 0.46;              % m
 a3 = 0.44;              % m
+linkL = 0.18;           % m - link length
 
 % Create Links
 Upper_Arm = link(0.46, 40, 2, 3.5);
@@ -38,7 +39,7 @@ Joint_3=joint(1.39, 5.3, -150, 110, 1.5*10^(-4), -5*10^(-4), 1.44*10^(-6), 8.67,
 Joint_4=joint(0.67, 6.7,  -90,   5, 1.5*10^(-4), -5*10^(-4), 1.44*10^(-6), 8.67, 0.84, 5.3*10^(-6), 10300, 0.025);
 
 % Define d3
-d3 = 1.5*10^(-3)*Upper_Arm.Diameter;
+d3 = -1.5*10^(-3)*Upper_Arm.Diameter;
 
 
 %% Define MDH Table
@@ -50,7 +51,7 @@ TableMDHsym = define_table(q1, q2, q3, q4, a2, a3, d3);
 %% Define Station and Base Reference Frames
 
 R_B = eye(3);
-P_B = [0 -P_By h]';
+P_B = [0 -P_By h+linkL/2]';
 T_B2S = buildT(R_B, P_B);
 T_S2B = inv_trans(T_B2S);
 
@@ -69,27 +70,14 @@ X_Tsym = simplify(trans2pose(T_T2Ssym));
 
 Jsym = simplify(jacobian(X_Tsym, [q1 q2 q3 q4]));
 
-% %% Test ikineAnal
-% Qtest = [pi/6 -pi/12, -pi/4, pi/12];
-% X_W2B = double(subs(X_W2Bsym, [q1, q2, q3, q4], [Qtest(1), Qtest(2), Qtest(3), Qtest(4)]));
-% 
-% tic
-% [Q] = invkinAnal(X_W2B, Upper_Arm.Length, Fore_Arm.Length, d3, "ElbowDown");
-% [Q] = invkineFMIN(X_W2B, Upper_Arm.Length, Fore_Arm.Length, d3, "ElbowDown");
-% stopwatch = toc;
-% 
-% Xtest = double(subs(X_W2Bsym, [q1, q2, q3, q4], [Q(1), Q(2), Q(3), Q(4)]));
-% fprintf('\nThe desired pose was:\n [%.4f \t%.4f \t%.4f \t%.4f \t%.4f \t%.4f]\n', X_W2B)
-% fprintf('\nThe obtained pose is:\n [%.4f \t%.4f \t%.4f \t%.4f \t%.4f \t%.4f]\n', Xtest)
-% fprintf('\nThe joint initial joint variables were:\n [%.4f \t%.4f \t%.4f \t%.4f]\n', Qtest)
-% fprintf('\nThe joint variables are:\n [%.4f \t%.4f \t%.4f \t%.4f]\n', Q)
-% fprintf('\nThe time required was: %.2f s\n', stopwatch)
-
 
 %% Dynamical equations (symbolic expression)
+
 [M, V, G, F] = dinEqs(Joint_1, Joint_2, Joint_3, Joint_4, Upper_Arm, Fore_Arm, P_T);
 
+
 % %% Trajectory Generation (Stowage to Navigation)
+% 
 % NSto2Nav=10; % number of via points
 % TSto2Nav=10; % total time from stowage to Navigation [s]
 % ft=1000; % path update rate [Hz]
@@ -143,18 +131,19 @@ Jsym = simplify(jacobian(X_Tsym, [q1 q2 q3 q4]));
 % title('Joint accelerations','Interpreter','latex')
 % set(gca,'FontSize',20)
 
+
 %% Plot Initial Condition
 
 close all
 
 % Set the Initial Joint Variables
-Q = [pi/12 pi/9, -pi/4, pi/4];
-% Q = Qinv;
+% Q = [pi/12 pi/9, -pi/4, pi/4];
+Q = [-pi/2, 0, pi, 0];
 
 % Compute Necessary Variables
 TableMDH = double(subs(TableMDHsym, [q1, q2, q3, q4], [Q(1), Q(2), Q(3), Q(4)]));
 T_W2B = double(subs(T_W2Bsym, [q1, q2, q3, q4], [Q(1), Q(2), Q(3), Q(4)]));
-% T_T2S = double(subs(T_T2Ssym, [q1, q2, q3, q4], [Q(1), Q(2), Q(3), Q(4)]));
+T_T2S = double(subs(T_T2Ssym, [q1, q2, q3, q4], [Q(1), Q(2), Q(3), Q(4)]));
 X_T = double(subs(X_Tsym, [q1, q2, q3, q4], [Q(1), Q(2), Q(3), Q(4)]));
 
 T_12B = tableRow2T(TableMDH(1, :));
@@ -185,6 +174,7 @@ boringButton = uicontrol('Style', 'pushbutton', 'String', 'Boring Button', 'Posi
 env = show_env(L, w, h);
 joints = show_joints(T_12S, T_22S, T_32S, T_W2S);
 links = show_links(Upper_Arm, T_22S, Fore_Arm, T_32S);
+scoop = show_Scoop(scoopLength, T_T2S);
 
 if options.show_frames
     mframes = show_mainframes(X_S, X_B, X_W, X_T);
@@ -193,8 +183,6 @@ if options.show_frames
 end
 
 axis equal
-
-scoop = plotScoop(scoopLength, T_12S, T_T2S);
 
 % Choose Material: [ambient, diffuse, specular, shininess, specularExponent]
 material([0.5, 0.6, 0.6, 0, 0.2]);
@@ -220,25 +208,27 @@ end
 set(boringButton, 'Callback', {@strobEffectCallback, lgt});
 
 
+% return
 
 %% Plot Live Evolution - Skipped for now...
 
 % Set the Joint Variables
 N = 100;
-q1_span = linspace(pi/12, pi/3, N)';
-q2_span = linspace(pi/9, pi/3, N)';
-q3_span = linspace(-pi/4, -pi/3, N)';
+q1_span = linspace(-pi/2, -pi/2, 2*N)';
+q2_span = [linspace(0, pi/3, N)'; pi/3*ones(N, 1)];
+q3_span = [pi*ones(N, 1); linspace(pi, pi*4/3, N)'];
+q4_span = linspace(0, pi/2, 2*N)';
 
 input('Press Enter to Start the Simulation...\n');
 
-for i = 1 : N
+for i = 1 : 2*N
 
-    Q = [q1_span(i) q2_span(i), q3_span(i), pi/4];
+    Q = [q1_span(i) q2_span(i), q3_span(i), q4_span(i)];
 
     % Compute Necessary Variables
     TableMDH = double(subs(TableMDHsym, [q1, q2, q3, q4], [Q(1), Q(2), Q(3), Q(4)]));
     T_W2B = double(subs(T_W2Bsym, [q1, q2, q3, q4], [Q(1), Q(2), Q(3), Q(4)]));
-%     T_T2S = double(subs(T_T2Ssym, [q1, q2, q3, q4], [Q(1), Q(2), Q(3), Q(4)]));
+    % T_T2S = double(subs(T_T2Ssym, [q1, q2, q3, q4], [Q(1), Q(2), Q(3), Q(4)]));
     X_T = double(subs(X_Tsym, [q1, q2, q3, q4], [Q(1), Q(2), Q(3), Q(4)]));
 
     T_12B = tableRow2T(TableMDH(1, :));
@@ -260,6 +250,9 @@ for i = 1 : N
     X_2 = trans2pose(T_22S);
     X_3 = trans2pose(T_32S);
 
+    clc
+    fprintf('Update Log:\nRoll = %.3f\nPitch = %.3f\nYaw = %.3f\n\n', rad2deg(X_T(4:6)));
+
 
     % Update the Plot
     update_joint(joints.J1, T_12S);
@@ -270,7 +263,7 @@ for i = 1 : N
     update_link(links.arm, T_22S, Upper_Arm);
     update_link(links.forearm, T_32S, Fore_Arm);
 
-    update_scoop(scoop, scoopLength, T_12S, T_T2S);
+    update_scoop(scoop, scoopLength, T_T2S);
 
     if options.show_frames
         update_frame(mframes.S, X_S);
@@ -286,3 +279,23 @@ for i = 1 : N
     pause(1/N)
 
 end
+
+
+return
+%% Test ikineAnal
+
+Qtest = [pi/6 -pi/12, -pi/4, pi/12];
+X_W2B = double(subs(X_W2Bsym, [q1, q2, q3, q4], [Qtest(1), Qtest(2), Qtest(3), Qtest(4)]));
+
+tic
+[Q] = invkine(X_W2B, Upper_Arm.Length, Fore_Arm.Length, d3, "ElbowDown");
+stopwatch = toc;
+
+Xtest = double(subs(X_W2Bsym, [q1, q2, q3, q4], [Q(1), Q(2), Q(3), Q(4)]));
+fprintf('\nThe desired pose was:\n [%.4f \t%.4f \t%.4f \t%.4f \t%.4f \t%.4f]\n', X_W2B)
+fprintf('\nThe obtained pose is:\n [%.4f \t%.4f \t%.4f \t%.4f \t%.4f \t%.4f]\n', Xtest)
+fprintf('\nThe joint initial joint variables were:\n [%.4f \t%.4f \t%.4f \t%.4f]\n', Qtest)
+fprintf('\nThe joint variables are:\n [%.4f \t%.4f \t%.4f \t%.4f]\n', Q)
+fprintf('\nThe time required was: %.2f s\n', stopwatch)
+
+

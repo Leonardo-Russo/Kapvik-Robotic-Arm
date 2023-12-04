@@ -1,4 +1,4 @@
-function [Q] = invkinAnal(X, L1, L2, d, typeOfSol)
+function [Q] = invkine(X, L1, L2, d, typeOfSol)
 % This function take as input the pose X of the wrist wrt the base in the 
 % base reference frame and the link length and gives as output the
 % corresponding joint angles that correspond to the particular solution
