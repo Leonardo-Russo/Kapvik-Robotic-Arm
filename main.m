@@ -8,6 +8,9 @@ addpath('Library/')
 
 options = struct('name', "Options");
 options.show_frames = false;
+options.show_manipulator = true;
+
+tic
 
 
 %% Define links and joints properties
@@ -50,7 +53,7 @@ TableMDHsym = define_table(q1, q2, q3, q4, a2, a3, d3);
 
 %% Define Station and Base Reference Frames
 
-R_B = eye(3);
+R_B = R3(pi);
 P_B = [0 -P_By h+linkL/2]';
 T_B2S = buildT(R_B, P_B);
 T_S2B = inv_trans(T_B2S);
@@ -137,13 +140,14 @@ Jsym = simplify(jacobian(X_Tsym, [q1 q2 q3 q4]));
 close all
 
 % Set the Initial Joint Variables
-% Q = [pi/12 pi/9, -pi/4, pi/4];
-Q = [-pi/2, 0, pi, 0];
+Q = [pi/2, pi/3, 0, 0];
+% offsets = [0, -pi/2, 8*pi/7, -pi/2];
+% Q = Q - offsets;
 
 % Compute Necessary Variables
 TableMDH = double(subs(TableMDHsym, [q1, q2, q3, q4], [Q(1), Q(2), Q(3), Q(4)]));
 T_W2B = double(subs(T_W2Bsym, [q1, q2, q3, q4], [Q(1), Q(2), Q(3), Q(4)]));
-T_T2S = double(subs(T_T2Ssym, [q1, q2, q3, q4], [Q(1), Q(2), Q(3), Q(4)]));
+% T_T2S = double(subs(T_T2Ssym, [q1, q2, q3, q4], [Q(1), Q(2), Q(3), Q(4)]));
 X_T = double(subs(X_Tsym, [q1, q2, q3, q4], [Q(1), Q(2), Q(3), Q(4)]));
 
 T_12B = tableRow2T(TableMDH(1, :));
@@ -172,9 +176,12 @@ figure('name', 'Enviroment Simulation')
 boringButton = uicontrol('Style', 'pushbutton', 'String', 'Boring Button', 'Position', [140 20 100 20]);
 
 env = show_env(L, w, h);
-joints = show_joints(T_12S, T_22S, T_32S, T_W2S);
-links = show_links(Upper_Arm, T_22S, Fore_Arm, T_32S);
-scoop = show_Scoop(scoopLength, T_T2S);
+
+if options.show_manipulator
+    joints = show_joints(T_12S, T_22S, T_32S, T_W2S);
+    links = show_links(Upper_Arm, T_22S, Fore_Arm, T_32S);
+    scoop = show_Scoop(scoopLength, T_T2S);
+end
 
 if options.show_frames
     mframes = show_mainframes(X_S, X_B, X_W, X_T);
@@ -207,14 +214,17 @@ end
 
 set(boringButton, 'Callback', {@strobEffectCallback, lgt});
 
+final_time = toc;
 
-% return
+fprintf('The program took %.2f seconds to run.\n', final_time)
+
+return
 
 %% Plot Live Evolution - Skipped for now...
 
 % Set the Joint Variables
 N = 100;
-q1_span = linspace(-pi/2, -pi/2, 2*N)';
+q1_span = linspace(0, -pi/2, 2*N)';
 q2_span = [linspace(0, pi/3, N)'; pi/3*ones(N, 1)];
 q3_span = [pi*ones(N, 1); linspace(pi, pi*4/3, N)'];
 q4_span = linspace(0, pi/2, 2*N)';
