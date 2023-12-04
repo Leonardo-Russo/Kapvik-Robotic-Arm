@@ -1,4 +1,4 @@
-function Q = invkine(X0, Qsym, X_Tsym)
+function Q = invkineFMIN(X0, Qsym, X_Tsym)
 % Description: this will be the shell function for the inverse kinematics.
 % 
 % Inputs:
@@ -42,7 +42,7 @@ Beq = [];
 
 fprintf('Performing the Inverse Kinematics ...\n')
 
-[Q, fval, exitflag] = fmincon(@(Q) invkineObjFun(Q, X0, Qsym, X_Tsym), Q0, A, B, Aeq, Beq, lb, ub, [], OptionsFMIN);
+[Q, fval, exitflag] = fmincon(@(Q) invkineFMINObjFun(Q, X0, Qsym, X_Tsym), Q0, A, B, Aeq, Beq, lb, ub, [], OptionsFMIN);
 
 
 % % ParticleSwarm Approach
