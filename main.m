@@ -8,10 +8,10 @@ addpath('Library/')
 
 % Define the Options
 options = struct('name', "Options");
-options.show_frames = true;
+options.show_frames = false;
 options.show_manipulator = true;
 
-tic
+tic     % necessary to evaluate runtime
 
 %% Define Manipulator Properties
 
@@ -32,17 +32,17 @@ a3 = 0.44;              % m
 linkL = 0.18;           % m - link length
 
 % Define Links
-Upper_Arm = link(0.46, 40, 2, 3.5);
-Fore_Arm = link(0.44, 40, 2, 3.5);
+UpperArm = link(0.46, 40, 2, 3.5);
+ForeArm = link(0.44, 40, 2, 3.5);
 
 % Define Joints
-Joint_1=joint(1.15, 8.4, -160, 100, 1.5*10^(-4), -5*10^(-4), 1.44*10^(-6), 8.67, 0.84, 5.3*10^(-6), 10300, 0.025);
-Joint_2=joint(1.28, 8.4,  -90,  90, 1.5*10^(-4), -5*10^(-4), 1.44*10^(-6), 8.67, 0.84, 5.3*10^(-6), 10300, 0.025);
-Joint_3=joint(1.39, 5.3, -150, 110, 1.5*10^(-4), -5*10^(-4), 1.44*10^(-6), 8.67, 0.84, 5.3*10^(-6), 10300, 0.025);
-Joint_4=joint(0.67, 6.7,  -90,   5, 1.5*10^(-4), -5*10^(-4), 1.44*10^(-6), 8.67, 0.84, 5.3*10^(-6), 10300, 0.025);
+Joint_1 = joint(1.15, 8.4, -160, 100, 1.5*10^(-4), -5*10^(-4), 1.44*10^(-6), 8.67, 0.84, 5.3*10^(-6), 10300, 0.025);
+Joint_2 = joint(1.28, 8.4,  -90,  90, 1.5*10^(-4), -5*10^(-4), 1.44*10^(-6), 8.67, 0.84, 5.3*10^(-6), 10300, 0.025);
+Joint_3 = joint(1.39, 5.3, -150, 110, 1.5*10^(-4), -5*10^(-4), 1.44*10^(-6), 8.67, 0.84, 5.3*10^(-6), 10300, 0.025);
+Joint_4 = joint(0.67, 6.7,  -90,   5, 1.5*10^(-4), -5*10^(-4), 1.44*10^(-6), 8.67, 0.84, 5.3*10^(-6), 10300, 0.025);
 
 % Define d3
-d3 = -1.5*10^(-3)*Upper_Arm.Diameter;
+d3 = -1.5*10^(-3)*UpperArm.Diameter;
 
 % Define Base Frame
 R_B = R3(pi);
@@ -78,7 +78,7 @@ Jsym = simplify(jacobian(X_Tsym, [q1 q2 q3 q4]));
 
 %% Dynamical equations (symbolic expression)
 
-[M, V, G, F] = dinEqs(Joint_1, Joint_2, Joint_3, Joint_4, Upper_Arm, Fore_Arm, P_T);
+[M, V, G, F] = dinEqs(Joint_1, Joint_2, Joint_3, Joint_4, UpperArm, ForeArm, P_T);
 
 
 % %% Trajectory Generation (Stowage to Navigation)
@@ -157,7 +157,7 @@ env = show_env(L, w, h);
 % Show the Manipulator
 if options.show_manipulator
     joints = show_joints(T_12S, T_22S, T_32S, T_W2S);
-    links = show_links(Upper_Arm, T_22S, Fore_Arm, T_32S);
+    links = show_links(UpperArm, T_22S, ForeArm, T_32S);
     scoop = show_Scoop(scoopLength, T_T2S);
 end
 
@@ -166,6 +166,9 @@ if options.show_frames
     mframes = show_mainframes(X_S, X_B, X_W, X_T);
     jframes = show_jointframes(X_1, X_2, X_3);
     toggleButton = uicontrol('Style', 'pushbutton', 'String', 'Show Legend', 'Position', [20 20 100 20]);
+else
+    mframes = [];
+    jframes = [];
 end
 
 axis equal      % necessary after all plots
@@ -193,10 +196,12 @@ set(boringButton, 'Callback', {@strobEffectCallback, lgt});
 
 % Create the Joint Variable Sliders
 sliderPositions = [400 20 120 20; 400 50 120 20; 400 80 120 20; 400 110 120 20];
-slider_q1 = createSlider('q1', -160, 100, rad2deg(Q(1)), @(src, event) updatePlot(src, event, Q, TableMDHsym, T_W2Bsym, X_Tsym, T_B2S, T_T2W, joints, links, scoop, mframes, jframes, options, Upper_Arm, Fore_Arm, scoopLength), sliderPositions(1, :));
-slider_q2 = createSlider('q2', -90, 90, rad2deg(Q(2)), @(src, event) updatePlot(src, event, Q, TableMDHsym, T_W2Bsym, X_Tsym, T_B2S, T_T2W, joints, links, scoop, mframes, jframes, options, Upper_Arm, Fore_Arm, scoopLength), sliderPositions(2, :));
-slider_q3 = createSlider('q3', -150, 110, rad2deg(Q(3)), @(src, event) updatePlot(src, event, Q, TableMDHsym, T_W2Bsym, X_Tsym, T_B2S, T_T2W, joints, links, scoop, mframes, jframes, options, Upper_Arm, Fore_Arm, scoopLength), sliderPositions(3, :));
-slider_q4 = createSlider('q4', -90, 5, rad2deg(Q(4)), @(src, event) updatePlot(src, event, Q, TableMDHsym, T_W2Bsym, X_Tsym, T_B2S, T_T2W, joints, links, scoop, mframes, jframes, options, Upper_Arm, Fore_Arm, scoopLength), sliderPositions(4, :));
+labelPositions = [530 20 50 20; 530 50 50 20; 530 80 50 20; 530 110 50 20];
+
+slider_q1 = createSlider('q1', -160, 100, rad2deg(Q(1)), @(src, event) updatePlot(src, event, Q, TableMDHsym, T_W2Bsym, X_Tsym, T_B2S, T_T2W, joints, links, scoop, mframes, jframes, options, UpperArm, ForeArm, scoopLength), sliderPositions(1, :), labelPositions(1, :));
+slider_q2 = createSlider('q2', -90, 90, rad2deg(Q(2)), @(src, event) updatePlot(src, event, Q, TableMDHsym, T_W2Bsym, X_Tsym, T_B2S, T_T2W, joints, links, scoop, mframes, jframes, options, UpperArm, ForeArm, scoopLength), sliderPositions(2, :), labelPositions(2, :));
+slider_q3 = createSlider('q3', -150, 110, rad2deg(Q(3)), @(src, event) updatePlot(src, event, Q, TableMDHsym, T_W2Bsym, X_Tsym, T_B2S, T_T2W, joints, links, scoop, mframes, jframes, options, UpperArm, ForeArm, scoopLength), sliderPositions(3, :), labelPositions(3, :));
+slider_q4 = createSlider('q4', -90, 5, rad2deg(Q(4)), @(src, event) updatePlot(src, event, Q, TableMDHsym, T_W2Bsym, X_Tsym, T_B2S, T_T2W, joints, links, scoop, mframes, jframes, options, UpperArm, ForeArm, scoopLength), sliderPositions(4, :), labelPositions(4, :));
 
 
 runtime = toc;
