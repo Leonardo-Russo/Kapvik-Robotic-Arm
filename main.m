@@ -6,24 +6,24 @@ clc
 
 addpath('Library/')
 
+% Define the Options
 options = struct('name', "Options");
 options.show_frames = false;
 options.show_manipulator = true;
 
-tic
+tic     % necessary to evaluate runtime
 
+%% Define Manipulator Properties
 
-%% Define links and joints properties
-
-% Box Parameters
+% Define Rover Dimensions
 L = 0.7;                % m
 w = 0.5;                % m
 h = 0.3;                % m
 
-% Base Shift
+% Define Base Shift along y
 P_By = 0.1;             % m
 
-% Scoop Dimension
+% Define Scoop Dimension
 scoopLength = 0.05;      % m
 
 % Other Parameters
@@ -31,38 +31,40 @@ a2 = 0.46;              % m
 a3 = 0.44;              % m
 linkL = 0.18;           % m - link length
 
-% Create Links
-Upper_Arm = link(0.46, 40, 2, 3.5);
-Fore_Arm = link(0.44, 40, 2, 3.5);
+% Define Links
+UpperArm = link(0.46, 40, 2, 3.5);
+ForeArm = link(0.44, 40, 2, 3.5);
 
-% Create Joints
-Joint_1=joint(1.15, 8.4, -160, 100, 1.5*10^(-4), -5*10^(-4), 1.44*10^(-6), 8.67, 0.84, 5.3*10^(-6), 10300, 0.025);
-Joint_2=joint(1.28, 8.4,  -90,  90, 1.5*10^(-4), -5*10^(-4), 1.44*10^(-6), 8.67, 0.84, 5.3*10^(-6), 10300, 0.025);
-Joint_3=joint(1.39, 5.3, -150, 110, 1.5*10^(-4), -5*10^(-4), 1.44*10^(-6), 8.67, 0.84, 5.3*10^(-6), 10300, 0.025);
-Joint_4=joint(0.67, 6.7,  -90,   5, 1.5*10^(-4), -5*10^(-4), 1.44*10^(-6), 8.67, 0.84, 5.3*10^(-6), 10300, 0.025);
+% Define Joints
+Joint_1 = joint(1.15, 8.4, -160, 100, 1.5*10^(-4), -5*10^(-4), 1.44*10^(-6), 8.67, 0.84, 5.3*10^(-6), 10300, 0.025);
+Joint_2 = joint(1.28, 8.4,  -90,  90, 1.5*10^(-4), -5*10^(-4), 1.44*10^(-6), 8.67, 0.84, 5.3*10^(-6), 10300, 0.025);
+Joint_3 = joint(1.39, 5.3, -150, 110, 1.5*10^(-4), -5*10^(-4), 1.44*10^(-6), 8.67, 0.84, 5.3*10^(-6), 10300, 0.025);
+Joint_4 = joint(0.67, 6.7,  -90,   5, 1.5*10^(-4), -5*10^(-4), 1.44*10^(-6), 8.67, 0.84, 5.3*10^(-6), 10300, 0.025);
 
 % Define d3
-d3 = -1.5*10^(-3)*Upper_Arm.Diameter;
+d3 = -1.5*10^(-3)*UpperArm.Diameter;
+
+% Define Base Frame
+R_B = R3(pi);
+P_B = [0 -P_By h+linkL/2]';
+T_B2S = buildT(R_B, P_B);
+T_S2B = inv_trans(T_B2S);
+
+% Define Tool Frame wrt Wrist Frame
+R_T = eye(3);
+P_T = [scoopLength 0 0]';
+T_T2W = buildT(R_T, P_T);
 
 
 %% Define MDH Table
 
 syms q1 q2 q3 q4 q1d q2d q3d q4d q1dd q2dd q3dd q4dd g real
 
+global Qsym
+Qsym = [q1, q2, q3, q4];
+
 TableMDHsym = define_table(q1, q2, q3, q4, a2, a3, d3);
 
-%% Define Station and Base Reference Frames
-
-R_B = R3(pi);
-P_B = [0 -P_By h+linkL/2]';
-T_B2S = buildT(R_B, P_B);
-T_S2B = inv_trans(T_B2S);
-
-R_T = eye(3);
-
-P_T = [scoopLength 0 0]';
-
-T_T2W = buildT(R_T, P_T);
 
 %% Compute Jacobian Matrix
 
@@ -76,7 +78,7 @@ Jsym = simplify(jacobian(X_Tsym, [q1 q2 q3 q4]));
 
 %% Dynamical equations (symbolic expression)
 
-[M, V, G, F] = dinEqs(Joint_1, Joint_2, Joint_3, Joint_4, Upper_Arm, Fore_Arm, P_T);
+[M, V, G, F] = dinEqs(Joint_1, Joint_2, Joint_3, Joint_4, UpperArm, ForeArm, P_T);
 
 
 % %% Trajectory Generation (Stowage to Navigation)
@@ -135,70 +137,50 @@ Jsym = simplify(jacobian(X_Tsym, [q1 q2 q3 q4]));
 % set(gca,'FontSize',20)
 
 
-%% Plot Initial Condition
+%% Manipulator Visualization
 
 close all
 
 % Set the Initial Joint Variables
-Q = [pi/2, pi/3, 0, 0];
-% offsets = [0, -pi/2, 8*pi/7, -pi/2];
-% Q = Q - offsets;
+global Q
+Q = [pi/2, pi/3, pi/3, 0];
 
-% Compute Necessary Variables
-TableMDH = double(subs(TableMDHsym, [q1, q2, q3, q4], [Q(1), Q(2), Q(3), Q(4)]));
-T_W2B = double(subs(T_W2Bsym, [q1, q2, q3, q4], [Q(1), Q(2), Q(3), Q(4)]));
-% T_T2S = double(subs(T_T2Ssym, [q1, q2, q3, q4], [Q(1), Q(2), Q(3), Q(4)]));
-X_T = double(subs(X_Tsym, [q1, q2, q3, q4], [Q(1), Q(2), Q(3), Q(4)]));
-
-T_12B = tableRow2T(TableMDH(1, :));
-T_12S = T_B2S * T_12B;
-T_221 = tableRow2T(TableMDH(2, :));
-T_22S = T_B2S * T_12B * T_221;
-T_322 = tableRow2T(TableMDH(3, :));
-T_32S = T_B2S * T_12B * T_221 * T_322;
-T_W23 = tableRow2T(TableMDH(4, :));
-T_W2S = T_B2S * T_12B * T_221 * T_322 * T_W23;
-T_T2W = [eye(3), P_T; 0 0 0 1];
-T_T2S = T_B2S * T_12B * T_221 * T_322 * T_W23 * T_T2W;
-
-X_S = zeros(6, 1);
-X_B = trans2pose(T_B2S);
-X_W = trans2pose(T_W2S);
-
-X_1 = trans2pose(T_12S);
-X_2 = trans2pose(T_22S);
-X_3 = trans2pose(T_32S);
+% Get Manipulator State
+[T_12S, T_22S, T_32S, T_W2S, T_T2S, X_S, X_B, X_W, X_T, X_1, X_2, X_3] = ...
+    getManipulatorState(Q, TableMDHsym, T_W2Bsym, X_Tsym, T_B2S, T_T2W);
 
 % Create the Workspace
 figure('name', 'Enviroment Simulation')
 
-% Add toggle buttons
-boringButton = uicontrol('Style', 'pushbutton', 'String', 'Boring Button', 'Position', [140 20 100 20]);
-
+% Show the Static Enviroment
 env = show_env(L, w, h);
 
+% Show the Manipulator
 if options.show_manipulator
     joints = show_joints(T_12S, T_22S, T_32S, T_W2S);
-    links = show_links(Upper_Arm, T_22S, Fore_Arm, T_32S);
+    links = show_links(UpperArm, T_22S, ForeArm, T_32S);
     scoop = show_Scoop(scoopLength, T_T2S);
 end
 
+% Show the Frames
 if options.show_frames
     mframes = show_mainframes(X_S, X_B, X_W, X_T);
     jframes = show_jointframes(X_1, X_2, X_3);
     toggleButton = uicontrol('Style', 'pushbutton', 'String', 'Show Legend', 'Position', [20 20 100 20]);
+else
+    mframes = [];
+    jframes = [];
 end
 
-axis equal
+axis equal      % necessary after all plots
 
-% Choose Material: [ambient, diffuse, specular, shininess, specularExponent]
-material([0.5, 0.6, 0.6, 0, 0.2]);
-
-% Set Light
+% Set Light Options
+material([0.5, 0.6, 0.6, 0, 0.2]);  % [ambient, diffuse, specular, shininess, specularExponent]
 lgt = light('Position', [2 2 5], 'Style', 'local');
 lightangle(150, 40);
 lighting gouraud
 
+% Create Frames Legend
 if options.show_frames
     lgd = legend([mframes.S.arw1, mframes.B.arw1, mframes.W.arw1, mframes.T.arw1, jframes.J1.arw1, jframes.J2.arw1, jframes.J3.arw1], ...
                  {'Station Frame', 'Base Frame', 'Wrist Frame', 'Tool Frame', ...
@@ -206,106 +188,57 @@ if options.show_frames
                   'location', 'best', 'fontsize', 8);
     
     set(lgd, 'Visible', 'off');     % by default legend is hidden
-
-    % Set the callback for the buttons
-    set(toggleButton, 'Callback', {@toggleLegendCallback, lgd});
-
+    set(toggleButton, 'Callback', {@toggleLegendCallback, lgd});    % set the callback for the boring button
 end
 
+% Add Boring button
+boringButton = uicontrol('Style', 'pushbutton', 'String', 'Boring Button', 'Position', [140 20 100 20]);
 set(boringButton, 'Callback', {@strobEffectCallback, lgt});
 
-final_time = toc;
+panelPosition = [0.65 0.01 0.34 0.36];  % [left bottom width height]
 
-fprintf('The program took %.2f seconds to run.\n', final_time)
+% Create a Panel to Group Sliders and Labels
+sliderPanel = uipanel('Title', 'Joint Controls', ...
+             'FontSize', 10, ...
+             'FontWeight', 'bold', ...
+             'BackgroundColor', 'white', ...
+             'Position', panelPosition, ...   % Position of the panel within the figure
+             'Parent', gcf);                  % Set the parent to the current figure
 
-return
+% Define Slider and Label Positions Relative to the Panel
+sliderPositions = [80 10 100 20; 80 40 100 20; 80 70 100 20; 80 100 100 20];
+labelPositions = [10 5 50 20; 10 35 50 20; 10 65 50 20; 10 95 50 20];
 
-%% Plot Live Evolution - Skipped for now...
-
-% Set the Joint Variables
-N = 100;
-q1_span = linspace(0, -pi/2, 2*N)';
-q2_span = [linspace(0, pi/3, N)'; pi/3*ones(N, 1)];
-q3_span = [pi*ones(N, 1); linspace(pi, pi*4/3, N)'];
-q4_span = linspace(0, pi/2, 2*N)';
-
-input('Press Enter to Start the Simulation...\n');
-
-for i = 1 : 2*N
-
-    Q = [q1_span(i) q2_span(i), q3_span(i), q4_span(i)];
-
-    % Compute Necessary Variables
-    TableMDH = double(subs(TableMDHsym, [q1, q2, q3, q4], [Q(1), Q(2), Q(3), Q(4)]));
-    T_W2B = double(subs(T_W2Bsym, [q1, q2, q3, q4], [Q(1), Q(2), Q(3), Q(4)]));
-    % T_T2S = double(subs(T_T2Ssym, [q1, q2, q3, q4], [Q(1), Q(2), Q(3), Q(4)]));
-    X_T = double(subs(X_Tsym, [q1, q2, q3, q4], [Q(1), Q(2), Q(3), Q(4)]));
-
-    T_12B = tableRow2T(TableMDH(1, :));
-    T_12S = T_B2S * T_12B;
-    T_221 = tableRow2T(TableMDH(2, :));
-    T_22S = T_B2S * T_12B * T_221;
-    T_322 = tableRow2T(TableMDH(3, :));
-    T_32S = T_B2S * T_12B * T_221 * T_322;
-    T_W23 = tableRow2T(TableMDH(4, :));
-    T_W2S = T_B2S * T_12B * T_221 * T_322 * T_W23;
-    T_T2W = [eye(3), P_T; 0 0 0 1];
-    T_T2S = T_B2S * T_12B * T_221 * T_322 * T_W23 * T_T2W;
-
-    X_S = zeros(6, 1);
-    X_B = trans2pose(T_B2S);
-    X_W = trans2pose(T_W2S);
-
-    X_1 = trans2pose(T_12S);
-    X_2 = trans2pose(T_22S);
-    X_3 = trans2pose(T_32S);
-
-    clc
-    fprintf('Update Log:\nRoll = %.3f\nPitch = %.3f\nYaw = %.3f\n\n', rad2deg(X_T(4:6)));
+% Create the Sliders
+slider_q1 = create_slider('q1', -160, 100, @(src, event) updatePlot(src, event, TableMDHsym, T_W2Bsym, X_Tsym, T_B2S, T_T2W, joints, links, scoop, mframes, jframes, options, UpperArm, ForeArm, scoopLength), sliderPositions(1, :), labelPositions(1, :), sliderPanel);
+slider_q2 = create_slider('q2', -90, 90, @(src, event) updatePlot(src, event, TableMDHsym, T_W2Bsym, X_Tsym, T_B2S, T_T2W, joints, links, scoop, mframes, jframes, options, UpperArm, ForeArm, scoopLength), sliderPositions(2, :), labelPositions(2, :), sliderPanel);
+slider_q3 = create_slider('q3', -150, 110, @(src, event) updatePlot(src, event, TableMDHsym, T_W2Bsym, X_Tsym, T_B2S, T_T2W, joints, links, scoop, mframes, jframes, options, UpperArm, ForeArm, scoopLength), sliderPositions(3, :), labelPositions(3, :), sliderPanel);
+slider_q4 = create_slider('q4', -90, 5, @(src, event) updatePlot(src, event, TableMDHsym, T_W2Bsym, X_Tsym, T_B2S, T_T2W, joints, links, scoop, mframes, jframes, options, UpperArm, ForeArm, scoopLength), sliderPositions(4, :), labelPositions(4, :), sliderPanel);
 
 
-    % Update the Plot
-    update_joint(joints.J1, T_12S);
-    update_joint(joints.J2, T_22S);
-    update_joint(joints.J3, T_32S);
-    update_joint(joints.J4, T_W2S);
+runtime = toc;
 
-    update_link(links.arm, T_22S, Upper_Arm);
-    update_link(links.forearm, T_32S, Fore_Arm);
-
-    update_scoop(scoop, scoopLength, T_T2S);
-
-    if options.show_frames
-        update_frame(mframes.S, X_S);
-        update_frame(mframes.B, X_B);
-        update_frame(mframes.W, X_W);
-        update_frame(mframes.T, X_T);
-
-        update_frame(jframes.J1, X_1);
-        update_frame(jframes.J2, X_2);
-        update_frame(jframes.J3, X_3);
-    end
-
-    pause(1/N)
-
-end
+fprintf('The program took %.2f seconds to run.\n', runtime)
 
 
 return
-%% Test ikineAnal
 
-Qtest = [pi/6 -pi/12, -pi/4, pi/12];
-X_W2B = double(subs(X_W2Bsym, [q1, q2, q3, q4], [Qtest(1), Qtest(2), Qtest(3), Qtest(4)]));
+% %% Test ikineAnal
+% 
+% Qtest = [pi/6 -pi/12, -pi/4, pi/12];
+% X_W2B = double(subs(X_W2Bsym, [q1, q2, q3, q4], [Qtest(1), Qtest(2), Qtest(3), Qtest(4)]));
+% 
+% tic
+% [Q] = invkine(X_W2B, Upper_Arm.Length, Fore_Arm.Length, d3, "ElbowDown");
+% stopwatch = toc;
+% 
+% Xtest = double(subs(X_W2Bsym, [q1, q2, q3, q4], [Q(1), Q(2), Q(3), Q(4)]));
+% fprintf('\nThe desired pose was:\n [%.4f \t%.4f \t%.4f \t%.4f \t%.4f \t%.4f]\n', X_W2B)
+% fprintf('\nThe obtained pose is:\n [%.4f \t%.4f \t%.4f \t%.4f \t%.4f \t%.4f]\n', Xtest)
+% fprintf('\nThe joint initial joint variables were:\n [%.4f \t%.4f \t%.4f \t%.4f]\n', Qtest)
+% fprintf('\nThe joint variables are:\n [%.4f \t%.4f \t%.4f \t%.4f]\n', Q)
+% fprintf('\nThe time required was: %.2f s\n', stopwatch)
+% 
 
-tic
-[Q] = invkine(X_W2B, Upper_Arm.Length, Fore_Arm.Length, d3, "ElbowDown");
-stopwatch = toc;
-
-Xtest = double(subs(X_W2Bsym, [q1, q2, q3, q4], [Q(1), Q(2), Q(3), Q(4)]));
-fprintf('\nThe desired pose was:\n [%.4f \t%.4f \t%.4f \t%.4f \t%.4f \t%.4f]\n', X_W2B)
-fprintf('\nThe obtained pose is:\n [%.4f \t%.4f \t%.4f \t%.4f \t%.4f \t%.4f]\n', Xtest)
-fprintf('\nThe joint initial joint variables were:\n [%.4f \t%.4f \t%.4f \t%.4f]\n', Qtest)
-fprintf('\nThe joint variables are:\n [%.4f \t%.4f \t%.4f \t%.4f]\n', Q)
-fprintf('\nThe time required was: %.2f s\n', stopwatch)
 
 
