@@ -1,6 +1,6 @@
-function updatePlot(src, event, Q, TableMDHsym, T_W2Bsym, X_Tsym, T_B2S, T_T2W, joints, links, scoop, mframes, jframes, options, Upper_Arm, Fore_Arm, scoopLength)
+function updatePlot(src, event, TableMDHsym, T_W2Bsym, X_Tsym, T_B2S, T_T2W, joints, links, scoop, mframes, jframes, options, Upper_Arm, Fore_Arm, scoopLength)
 
-global Qsym
+global Q Qsym
 q1 = Qsym(1);
 q2 = Qsym(2);
 q3 = Qsym(3);

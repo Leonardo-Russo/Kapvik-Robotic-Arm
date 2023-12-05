@@ -142,6 +142,7 @@ Jsym = simplify(jacobian(X_Tsym, [q1 q2 q3 q4]));
 close all
 
 % Set the Initial Joint Variables
+global Q
 Q = [pi/2, pi/3, pi/3, 0];
 
 % Get Manipulator State
@@ -194,14 +195,25 @@ end
 boringButton = uicontrol('Style', 'pushbutton', 'String', 'Boring Button', 'Position', [140 20 100 20]);
 set(boringButton, 'Callback', {@strobEffectCallback, lgt});
 
-% Create the Joint Variable Sliders
-sliderPositions = [400 20 120 20; 400 50 120 20; 400 80 120 20; 400 110 120 20];
-labelPositions = [530 20 50 20; 530 50 50 20; 530 80 50 20; 530 110 50 20];
+panelPosition = [0.65 0.01 0.34 0.36];  % [left bottom width height]
 
-slider_q1 = createSlider('q1', -160, 100, rad2deg(Q(1)), @(src, event) updatePlot(src, event, Q, TableMDHsym, T_W2Bsym, X_Tsym, T_B2S, T_T2W, joints, links, scoop, mframes, jframes, options, UpperArm, ForeArm, scoopLength), sliderPositions(1, :), labelPositions(1, :));
-slider_q2 = createSlider('q2', -90, 90, rad2deg(Q(2)), @(src, event) updatePlot(src, event, Q, TableMDHsym, T_W2Bsym, X_Tsym, T_B2S, T_T2W, joints, links, scoop, mframes, jframes, options, UpperArm, ForeArm, scoopLength), sliderPositions(2, :), labelPositions(2, :));
-slider_q3 = createSlider('q3', -150, 110, rad2deg(Q(3)), @(src, event) updatePlot(src, event, Q, TableMDHsym, T_W2Bsym, X_Tsym, T_B2S, T_T2W, joints, links, scoop, mframes, jframes, options, UpperArm, ForeArm, scoopLength), sliderPositions(3, :), labelPositions(3, :));
-slider_q4 = createSlider('q4', -90, 5, rad2deg(Q(4)), @(src, event) updatePlot(src, event, Q, TableMDHsym, T_W2Bsym, X_Tsym, T_B2S, T_T2W, joints, links, scoop, mframes, jframes, options, UpperArm, ForeArm, scoopLength), sliderPositions(4, :), labelPositions(4, :));
+% Create a Panel to Group Sliders and Labels
+sliderPanel = uipanel('Title', 'Joint Controls', ...
+             'FontSize', 10, ...
+             'FontWeight', 'bold', ...
+             'BackgroundColor', 'white', ...
+             'Position', panelPosition, ...   % Position of the panel within the figure
+             'Parent', gcf);                  % Set the parent to the current figure
+
+% Define Slider and Label Positions Relative to the Panel
+sliderPositions = [80 10 100 20; 80 40 100 20; 80 70 100 20; 80 100 100 20];
+labelPositions = [10 5 50 20; 10 35 50 20; 10 65 50 20; 10 95 50 20];
+
+% Create the Sliders
+slider_q1 = create_slider('q1', -160, 100, @(src, event) updatePlot(src, event, TableMDHsym, T_W2Bsym, X_Tsym, T_B2S, T_T2W, joints, links, scoop, mframes, jframes, options, UpperArm, ForeArm, scoopLength), sliderPositions(1, :), labelPositions(1, :), sliderPanel);
+slider_q2 = create_slider('q2', -90, 90, @(src, event) updatePlot(src, event, TableMDHsym, T_W2Bsym, X_Tsym, T_B2S, T_T2W, joints, links, scoop, mframes, jframes, options, UpperArm, ForeArm, scoopLength), sliderPositions(2, :), labelPositions(2, :), sliderPanel);
+slider_q3 = create_slider('q3', -150, 110, @(src, event) updatePlot(src, event, TableMDHsym, T_W2Bsym, X_Tsym, T_B2S, T_T2W, joints, links, scoop, mframes, jframes, options, UpperArm, ForeArm, scoopLength), sliderPositions(3, :), labelPositions(3, :), sliderPanel);
+slider_q4 = create_slider('q4', -90, 5, @(src, event) updatePlot(src, event, TableMDHsym, T_W2Bsym, X_Tsym, T_B2S, T_T2W, joints, links, scoop, mframes, jframes, options, UpperArm, ForeArm, scoopLength), sliderPositions(4, :), labelPositions(4, :), sliderPanel);
 
 
 runtime = toc;
@@ -209,81 +221,8 @@ runtime = toc;
 fprintf('The program took %.2f seconds to run.\n', runtime)
 
 
-
-
 return
 
-% %% Plot Live Evolution - Skipped for now...
-% 
-% % Set the Joint Variables
-% N = 100;
-% q1_span = linspace(0, -pi/2, 2*N)';
-% q2_span = [linspace(0, pi/3, N)'; pi/3*ones(N, 1)];
-% q3_span = [pi*ones(N, 1); linspace(pi, pi*4/3, N)'];
-% q4_span = linspace(0, pi/2, 2*N)';
-% 
-% input('Press Enter to Start the Simulation...\n');
-% 
-% for i = 1 : 2*N
-% 
-%     Q = [q1_span(i) q2_span(i), q3_span(i), q4_span(i)];
-% 
-%     % Compute Necessary Variables
-%     TableMDH = double(subs(TableMDHsym, [q1, q2, q3, q4], [Q(1), Q(2), Q(3), Q(4)]));
-%     T_W2B = double(subs(T_W2Bsym, [q1, q2, q3, q4], [Q(1), Q(2), Q(3), Q(4)]));
-%     % T_T2S = double(subs(T_T2Ssym, [q1, q2, q3, q4], [Q(1), Q(2), Q(3), Q(4)]));
-%     X_T = double(subs(X_Tsym, [q1, q2, q3, q4], [Q(1), Q(2), Q(3), Q(4)]));
-% 
-%     T_12B = tableRow2T(TableMDH(1, :));
-%     T_12S = T_B2S * T_12B;
-%     T_221 = tableRow2T(TableMDH(2, :));
-%     T_22S = T_B2S * T_12B * T_221;
-%     T_322 = tableRow2T(TableMDH(3, :));
-%     T_32S = T_B2S * T_12B * T_221 * T_322;
-%     T_W23 = tableRow2T(TableMDH(4, :));
-%     T_W2S = T_B2S * T_12B * T_221 * T_322 * T_W23;
-%     T_T2W = [eye(3), P_T; 0 0 0 1];
-%     T_T2S = T_B2S * T_12B * T_221 * T_322 * T_W23 * T_T2W;
-% 
-%     X_S = zeros(6, 1);
-%     X_B = trans2pose(T_B2S);
-%     X_W = trans2pose(T_W2S);
-% 
-%     X_1 = trans2pose(T_12S);
-%     X_2 = trans2pose(T_22S);
-%     X_3 = trans2pose(T_32S);
-% 
-%     clc
-%     fprintf('Update Log:\nRoll = %.3f\nPitch = %.3f\nYaw = %.3f\n\n', rad2deg(X_T(4:6)));
-% 
-%     % Update the Plot
-%     update_joint(joints.J1, T_12S);
-%     update_joint(joints.J2, T_22S);
-%     update_joint(joints.J3, T_32S);
-%     update_joint(joints.J4, T_W2S);
-% 
-%     update_link(links.arm, T_22S, Upper_Arm);
-%     update_link(links.forearm, T_32S, Fore_Arm);
-% 
-%     update_scoop(scoop, scoopLength, T_T2S);
-% 
-%     if options.show_frames
-%         update_frame(mframes.S, X_S);
-%         update_frame(mframes.B, X_B);
-%         update_frame(mframes.W, X_W);
-%         update_frame(mframes.T, X_T);
-% 
-%         update_frame(jframes.J1, X_1);
-%         update_frame(jframes.J2, X_2);
-%         update_frame(jframes.J3, X_3);
-%     end
-% 
-%     pause(1/N)
-% 
-% end
-% 
-% 
-% 
 % %% Test ikineAnal
 % 
 % Qtest = [pi/6 -pi/12, -pi/4, pi/12];
