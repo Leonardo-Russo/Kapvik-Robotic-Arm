@@ -8,10 +8,12 @@ addpath('Library/')
 
 % Define the Options
 options = struct('name', "Options");
-options.show_frames = false;
+options.show_frames = true;
 options.show_manipulator = true;
 
 tic     % necessary to evaluate runtime
+
+global Jsym
 
 %% Define Manipulator Properties
 
@@ -143,11 +145,11 @@ close all
 
 % Set the Initial Joint Variables
 global Q
-Q = [pi/2, pi/3, pi/3, 0];
+Q = [0, pi/3, pi/3, 0];
 
 % Get Manipulator State
 [T_12S, T_22S, T_32S, T_W2S, T_T2S, X_S, X_B, X_W, X_T, X_1, X_2, X_3] = ...
-    getManipulatorState(Q, TableMDHsym, T_W2Bsym, X_Tsym, T_B2S, T_T2W);
+    getManipulatorState(Q, TableMDHsym, X_Tsym, T_B2S, T_T2W);
 
 % Create the Workspace
 figure('name', 'Enviroment Simulation')
@@ -195,9 +197,8 @@ end
 boringButton = uicontrol('Style', 'pushbutton', 'String', 'Boring Button', 'Position', [140 20 100 20]);
 set(boringButton, 'Callback', {@strobEffectCallback, lgt});
 
-panelPosition = [0.65 0.01 0.34 0.36];  % [left bottom width height]
-
 % Create a Panel to Group Sliders and Labels
+panelPosition = [0.65 0.01 0.34 0.36];  % [left bottom width height]
 sliderPanel = uipanel('Title', 'Joint Controls', ...
              'FontSize', 10, ...
              'FontWeight', 'bold', ...
@@ -210,10 +211,10 @@ sliderPositions = [80 10 100 20; 80 40 100 20; 80 70 100 20; 80 100 100 20];
 labelPositions = [10 5 50 20; 10 35 50 20; 10 65 50 20; 10 95 50 20];
 
 % Create the Sliders
-slider_q1 = create_slider('q1', -160, 100, @(src, event) updatePlot(src, event, TableMDHsym, T_W2Bsym, X_Tsym, T_B2S, T_T2W, joints, links, scoop, mframes, jframes, options, UpperArm, ForeArm, scoopLength), sliderPositions(1, :), labelPositions(1, :), sliderPanel);
-slider_q2 = create_slider('q2', -90, 90, @(src, event) updatePlot(src, event, TableMDHsym, T_W2Bsym, X_Tsym, T_B2S, T_T2W, joints, links, scoop, mframes, jframes, options, UpperArm, ForeArm, scoopLength), sliderPositions(2, :), labelPositions(2, :), sliderPanel);
-slider_q3 = create_slider('q3', -150, 110, @(src, event) updatePlot(src, event, TableMDHsym, T_W2Bsym, X_Tsym, T_B2S, T_T2W, joints, links, scoop, mframes, jframes, options, UpperArm, ForeArm, scoopLength), sliderPositions(3, :), labelPositions(3, :), sliderPanel);
-slider_q4 = create_slider('q4', -90, 5, @(src, event) updatePlot(src, event, TableMDHsym, T_W2Bsym, X_Tsym, T_B2S, T_T2W, joints, links, scoop, mframes, jframes, options, UpperArm, ForeArm, scoopLength), sliderPositions(4, :), labelPositions(4, :), sliderPanel);
+slider_q1 = create_slider('q1', -160, 100, @(src, event) updatePlot(src, event, TableMDHsym, X_Tsym, T_B2S, T_T2W, joints, links, scoop, mframes, jframes, options, UpperArm, ForeArm, scoopLength), sliderPositions(1, :), labelPositions(1, :), sliderPanel);
+slider_q2 = create_slider('q2', -90, 90, @(src, event) updatePlot(src, event, TableMDHsym, X_Tsym, T_B2S, T_T2W, joints, links, scoop, mframes, jframes, options, UpperArm, ForeArm, scoopLength), sliderPositions(2, :), labelPositions(2, :), sliderPanel);
+slider_q3 = create_slider('q3', -150, 110, @(src, event) updatePlot(src, event, TableMDHsym, X_Tsym, T_B2S, T_T2W, joints, links, scoop, mframes, jframes, options, UpperArm, ForeArm, scoopLength), sliderPositions(3, :), labelPositions(3, :), sliderPanel);
+slider_q4 = create_slider('q4', -90, 5, @(src, event) updatePlot(src, event, TableMDHsym, X_Tsym, T_B2S, T_T2W, joints, links, scoop, mframes, jframes, options, UpperArm, ForeArm, scoopLength), sliderPositions(4, :), labelPositions(4, :), sliderPanel);
 
 
 runtime = toc;
@@ -223,22 +224,20 @@ fprintf('The program took %.2f seconds to run.\n', runtime)
 
 return
 
-% %% Test ikineAnal
-% 
-% Qtest = [pi/6 -pi/12, -pi/4, pi/12];
-% X_W2B = double(subs(X_W2Bsym, [q1, q2, q3, q4], [Qtest(1), Qtest(2), Qtest(3), Qtest(4)]));
-% 
-% tic
-% [Q] = invkine(X_W2B, Upper_Arm.Length, Fore_Arm.Length, d3, "ElbowDown");
-% stopwatch = toc;
-% 
-% Xtest = double(subs(X_W2Bsym, [q1, q2, q3, q4], [Q(1), Q(2), Q(3), Q(4)]));
-% fprintf('\nThe desired pose was:\n [%.4f \t%.4f \t%.4f \t%.4f \t%.4f \t%.4f]\n', X_W2B)
-% fprintf('\nThe obtained pose is:\n [%.4f \t%.4f \t%.4f \t%.4f \t%.4f \t%.4f]\n', Xtest)
-% fprintf('\nThe joint initial joint variables were:\n [%.4f \t%.4f \t%.4f \t%.4f]\n', Qtest)
-% fprintf('\nThe joint variables are:\n [%.4f \t%.4f \t%.4f \t%.4f]\n', Q)
-% fprintf('\nThe time required was: %.2f s\n', stopwatch)
-% 
+%% Test Analytic InvKine
+
+Qtest = Q;
+X_W2B = double(subs(X_W2Bsym, [q1, q2, q3, q4], [Qtest(1), Qtest(2), Qtest(3), Qtest(4)]));
+
+[Qinv] = invkine(X_W2B, UpperArm.Length, ForeArm.Length, d3, "ElbowUp");
+
+Xtest = double(subs(X_W2Bsym, [q1, q2, q3, q4], [Qinv(1), Qinv(2), Qinv(3), Qinv(4)]));
+
+fprintf('\nThe desired pose was:\n [%.4f \t%.4f \t%.4f \t%.4f \t%.4f \t%.4f]\n', X_W2B)
+fprintf('\nThe obtained pose is:\n [%.4f \t%.4f \t%.4f \t%.4f \t%.4f \t%.4f]\n', Xtest)
+fprintf('\nThe desired joint variables were:\n [%.4f \t%.4f \t%.4f \t%.4f]\n', Qtest)
+fprintf('\nThe joint variables are:\n [%.4f \t%.4f \t%.4f \t%.4f]\n', Qinv)
+
 
 
 

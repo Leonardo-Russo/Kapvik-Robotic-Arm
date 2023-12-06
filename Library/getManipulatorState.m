@@ -1,5 +1,5 @@
 function [T_12S, T_22S, T_32S, T_W2S, T_T2S, X_S, X_B, X_W, X_T, X_1, X_2, X_3] = ...
-          getManipulatorState(Q, TableMDHsym, T_W2Bsym, X_Tsym, T_B2S, T_T2W)
+          getManipulatorState(Q, TableMDHsym, X_Tsym, T_B2S, T_T2W)
 % Description: this function evaluates the manipulator state from its
 % joint variables state Q.
 
@@ -11,7 +11,6 @@ q4 = Qsym(4);
 
 % Compute the Symbolic Quantities
 TableMDH = double(subs(TableMDHsym, [q1, q2, q3, q4], [Q(1), Q(2), Q(3), Q(4)]));
-T_W2B = double(subs(T_W2Bsym, [q1, q2, q3, q4], [Q(1), Q(2), Q(3), Q(4)]));
 X_T = double(subs(X_Tsym, [q1, q2, q3, q4], [Q(1), Q(2), Q(3), Q(4)]));
 
 % Compute Transformation Matrices
