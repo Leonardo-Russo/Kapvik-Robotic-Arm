@@ -1,4 +1,4 @@
-function frame = show_frame(X, color, name)
+function frame = show_frame(T, color, name)
 % Description: this function plots the reference frames from the pose.
 
 if nargin < 2
@@ -19,13 +19,12 @@ else
     ax3 = "$Z$";
 end
 
+X = trans2pose(T);
 r = X(1:3);
-roll = X(4);
-pitch = X(5);
-yaw = X(6);
+R = T(1:3, 1:3);
 
 alpha = 0.15;   % axis length
-F = R1(roll) * R2(pitch) * R3(yaw) * alpha*eye(3);
+F = R' * alpha*eye(3);
 
 origin = plot3(r(1), r(2), r(3), 'Color', color, 'marker', '*', 'HandleVisibility','off');
 

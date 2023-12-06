@@ -26,9 +26,8 @@ X = trans2pose(T);
 x0 = X(1);
 y0 = X(2);
 z0 = X(3);
-roll = rad2deg(X(4));
-pitch = rad2deg(X(5));
-yaw = rad2deg(X(6));
+
+R = T(1:3, 1:3);
 
 % Create the Cylinder along the z-axis
 n_points = 50;      % n° of points to create a smooth cylinder
@@ -42,7 +41,7 @@ xx = xx * L;        % scale the x-dimension for its length
 
 % Rotation of the points
 all_points = [xx(:)'; yy(:)'; zz(:)'];
-R = R3(-yaw,"deg")*R2(-pitch,"deg")*R1(-roll,"deg");
+
 rotated_points = R * all_points;
 xx = x0+reshape(rotated_points(1,:), size(xx));
 yy = y0+reshape(rotated_points(2,:), size(yy));

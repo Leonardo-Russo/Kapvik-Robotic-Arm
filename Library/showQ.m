@@ -4,6 +4,6 @@ function showQ()
 global Q
 
 clc
-fprintf('Q = [%.1f\t%.1f\t%.1f\t%.1f]\n', rad2deg(Q));
+fprintf('Q\t=\t[%.1f\t%.1f\t%.1f\t%.1f]\n', rad2deg(Q));
 
 end

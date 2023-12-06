@@ -9,12 +9,11 @@ X = trans2pose(T);
 x0 = X(1);
 y0 = X(2);
 z0 = X(3);
-roll = rad2deg(X(4));
-pitch = rad2deg(X(5));
-yaw = rad2deg(X(6));
+
+R = T(1:3, 1:3);
 
 % Set Cylinder Orientation
-R = R3(-yaw,"deg")*R2(-pitch,"deg")*R1(-roll,"deg")*R2(90,"deg");
+R = R * R2(pi/2);
 all_points = [xx(:)'; yy(:)'; zz(:)'];
 rotated_points = R * all_points;
 xx = x0+reshape(rotated_points(1,:), size(xx));

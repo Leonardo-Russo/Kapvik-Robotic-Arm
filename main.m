@@ -8,7 +8,7 @@ addpath('Library/')
 
 % Define the Options
 options = struct('name', "Options");
-options.show_frames = true;
+options.show_frames = false;
 options.show_manipulator = true;
 
 tic     % necessary to evaluate runtime
@@ -56,6 +56,9 @@ T_S2B = inv_trans(T_B2S);
 R_T = eye(3);
 P_T = [scoopLength 0 0]';
 T_T2W = buildT(R_T, P_T);
+
+% Create Station Frame
+T_S2S = eye(4);
 
 
 %% Define MDH Table
@@ -145,10 +148,10 @@ close all
 
 % Set the Initial Joint Variables
 global Q
-Q = [0, pi/3, pi/3, 0];
+Q = [pi/2-pi, pi/4, pi/3, -pi/3];
 
 % Get Manipulator State
-[T_12S, T_22S, T_32S, T_W2S, T_T2S, X_S, X_B, X_W, X_T, X_1, X_2, X_3] = ...
+[T_12S, T_22S, T_32S, T_W2S, T_T2S, X_T] = ...
     getManipulatorState(Q, TableMDHsym, X_Tsym, T_B2S, T_T2W);
 
 % Create the Workspace
@@ -166,8 +169,8 @@ end
 
 % Show the Frames
 if options.show_frames
-    mframes = show_mainframes(X_S, X_B, X_W, X_T);
-    jframes = show_jointframes(X_1, X_2, X_3);
+    mframes = show_mainframes(T_S2S, T_B2S, T_W2S, T_T2S);
+    jframes = show_jointframes(T_12S, T_22S, T_32S);
     toggleButton = uicontrol('Style', 'pushbutton', 'String', 'Show Legend', 'Position', [20 20 100 20]);
 else
     mframes = [];
