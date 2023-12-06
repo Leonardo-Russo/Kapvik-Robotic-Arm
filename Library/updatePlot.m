@@ -1,4 +1,4 @@
-function updatePlot(src, event, TableMDHsym, X_Tsym, T_B2S, T_T2W, joints, links, scoop, mframes, jframes, options, Upper_Arm, Fore_Arm, scoopLength)
+function updatePlot(src, ~, TableMDHsym, X_Tsym, T_B2S, T_T2W, joints, links, scoop, mframes, jframes, options, Upper_Arm, Fore_Arm, scoopLength)
 
 global Q Qsym
 q1 = Qsym(1);
@@ -11,9 +11,10 @@ newAngle = deg2rad(get(src, 'Value'));      % get the new value from the slider
 Q(jointIndex) = newAngle;                   % update the corresponding joint variable
 
 % Compute new Manipulator State
-[T_12S, T_22S, T_32S, T_W2S, T_T2S, X_S, X_B, X_W, X_T, X_1, X_2, X_3] = ...
+[T_12S, T_22S, T_32S, T_W2S, T_T2S, X_T] = ...
     getManipulatorState(Q, TableMDHsym, X_Tsym, T_B2S, T_T2W);
 
+T_S2S = eye(4);
 
 % Update the Plot
 update_joint(joints.J1, T_12S);
@@ -27,24 +28,19 @@ update_link(links.forearm, T_32S, Fore_Arm);
 update_scoop(scoop, scoopLength, T_T2S);
 
 if options.show_frames
-    update_frame(mframes.S, X_S);
-    update_frame(mframes.B, X_B);
-    update_frame(mframes.W, X_W);
-    update_frame(mframes.T, X_T);
+    update_frame(mframes.S, T_S2S);
+    update_frame(mframes.B, T_B2S);
+    update_frame(mframes.W, T_W2S);
+    update_frame(mframes.T, T_T2S);
 
-    update_frame(jframes.J1, X_1);
-    update_frame(jframes.J2, X_2);
-    update_frame(jframes.J3, X_3);
+    update_frame(jframes.J1, T_12S);
+    update_frame(jframes.J2, T_22S);
+    update_frame(jframes.J3, T_32S);
 end
 
-drawnow;    % visually update the plot
-
+% Command Window Logs
 showQ
-
-show_pseudodetJ
-
-fprintf('q234\t=\t%.4f\n', Q(2)+Q(3)+Q(4))
-
-fprintf('\nThe Tool pose is:\n [%.4f \t%.4f \t%.4f \t%.4f \t%.4f \t%.4f]\n', X_T)
+fprintf('X_T\t=\t[%.3f \t%.3f \t%.3f \t%.3f \t%.3f \t%.3f]\n', X_T)
+% show_pseudodetJ     % show pseudo-determinant of Jacobian Matrix
 
 end

@@ -1,11 +1,11 @@
-function frames = show_mainframes(X_S, X_B, X_W, X_T)
+function frames = show_mainframes(T_S2S, T_B2S, T_W2S, T_T2S)
 % Description: this function plots the main reference frames in the
 % enviroment.
 
-S = show_frame(X_S, 'k', "S");              % Station frame
-B = show_frame(X_B, '#2b31ed', "B");        % Base frame
-W = show_frame(X_W, "#EDB120", "W");        % Wrist Frame
-T = show_frame(X_T, '#e84f1c', "T");        % Tool frame
+S = show_frame(T_S2S, 'k', "S");              % Station frame
+B = show_frame(T_B2S, '#2b31ed', "B");        % Base frame
+W = show_frame(T_W2S, "#EDB120", "W");        % Wrist Frame
+T = show_frame(T_T2S, '#e84f1c', "T");        % Tool frame
 
 % Return Frames
 frames = struct('name', "Main Frames");

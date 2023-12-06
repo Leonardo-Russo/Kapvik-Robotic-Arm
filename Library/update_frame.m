@@ -1,14 +1,13 @@
-function update_frame(frame, Xnew)
+function update_frame(frame, Tnew)
 
 % Retrieve New Pose from Input
+Xnew = trans2pose(Tnew);
 r_new = Xnew(1:3);
-roll_new = Xnew(4);
-pitch_new = Xnew(5);
-yaw_new = Xnew(6);
+Rnew = Tnew(1:3, 1:3);
 
 % Calculate New Frame Orientation
 alpha = 0.15;   % axis length
-F_new = R1(roll_new) * R2(pitch_new) * R3(yaw_new) * alpha * eye(3);
+F_new = Rnew' * alpha * eye(3);
 
 % Update Frame Origin
 set(frame.O, 'XData', r_new(1), 'YData', r_new(2), 'ZData', r_new(3));
