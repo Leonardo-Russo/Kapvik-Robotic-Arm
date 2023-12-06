@@ -1,4 +1,4 @@
-function updatePlot(src, event, TableMDHsym, T_W2Bsym, X_Tsym, T_B2S, T_T2W, joints, links, scoop, mframes, jframes, options, Upper_Arm, Fore_Arm, scoopLength)
+function updatePlot(src, event, TableMDHsym, X_Tsym, T_B2S, T_T2W, joints, links, scoop, mframes, jframes, options, Upper_Arm, Fore_Arm, scoopLength)
 
 global Q Qsym
 q1 = Qsym(1);
@@ -12,7 +12,7 @@ Q(jointIndex) = newAngle;                   % update the corresponding joint var
 
 % Compute new Manipulator State
 [T_12S, T_22S, T_32S, T_W2S, T_T2S, X_S, X_B, X_W, X_T, X_1, X_2, X_3] = ...
-    getManipulatorState(Q, TableMDHsym, T_W2Bsym, X_Tsym, T_B2S, T_T2W);
+    getManipulatorState(Q, TableMDHsym, X_Tsym, T_B2S, T_T2W);
 
 
 % Update the Plot
@@ -38,5 +38,13 @@ if options.show_frames
 end
 
 drawnow;    % visually update the plot
+
+showQ
+
+show_pseudodetJ
+
+fprintf('q234\t=\t%.4f\n', Q(2)+Q(3)+Q(4))
+
+fprintf('\nThe Tool pose is:\n [%.4f \t%.4f \t%.4f \t%.4f \t%.4f \t%.4f]\n', X_T)
 
 end
