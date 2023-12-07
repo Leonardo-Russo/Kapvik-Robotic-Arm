@@ -90,10 +90,10 @@ Jsym = simplify(jacobian(X_Tsym, [q1 q2 q3 q4]));
 % 
 % NSto2Nav=10; % number of via points
 % TSto2Nav=10; % total time from stowage to Navigation [s]
-% ft=1000; % path update rate [Hz]
-% thetaddMax=deg2rad(40); % [rad/s^2] me la sono inventata, va aggiustata
+% ft=100; % path update rate [Hz]
+% thetaddMax=deg2rad(40); % [rad/s^2] me la sono inventata sulla base delle slide, va aggiustata
 % 
-% q0Sto2Nav=[0 0 0 0]'; % It is necessary to start from joint space because of the intial pose singularity (q3 offset of 180°)
+% q0Sto2Nav=[pi/2 -pi/2 -pi/2 -pi/6]';
 % % Pose at via points
 % % We have to decide X for all via points from Stowage to Navigation
 % for i=1:N-1
@@ -148,7 +148,8 @@ close all
 
 % Set the Initial Joint Variables
 global Q
-Q = [pi/2-pi, pi/4, pi/3, -pi/3];
+Q=[pi/2 -pi/2 -pi/2 -pi/6];
+% Q = [pi/4 -pi/2 deg2rad(110) 0];
 
 % Get Manipulator State
 [T_12S, T_22S, T_32S, T_W2S, T_T2S, X_T] = ...
