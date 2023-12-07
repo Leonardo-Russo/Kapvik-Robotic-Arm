@@ -70,6 +70,7 @@ Qsym = [q1, q2, q3, q4];
 
 TableMDHsym = define_table(q1, q2, q3, q4, a2, a3, d3);
 
+fprintf("Initializing...");
 
 %% Compute Jacobian Matrix
 
@@ -148,8 +149,19 @@ close all
 
 % Set the Initial Joint Variables
 global Q
+
+%stowage position
 Q=[pi/2 -pi/2 -pi/2 -pi/6];
-% Q = [pi/4 -pi/2 deg2rad(110) 0];
+
+%navigation position
+Q=[pi/2 -3*pi/20 -pi/6 -pi/6];
+
+%retrieval position
+Q=[-pi/2 -pi/2 pi/4 -pi/2];
+
+%transfer position
+Q=[-pi/15 -pi/9 -5*pi/18 -pi/2]; 
+
 
 % Get Manipulator State
 [T_12S, T_22S, T_32S, T_W2S, T_T2S, X_T] = ...
