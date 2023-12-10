@@ -72,35 +72,39 @@ TableMDHsym = define_table(q1, q2, q3, q4, a2, a3, d3);
 
 fprintf("Initializing...");
 
-% %% Compute Jacobian Matrix
-% 
-% T_W2Bsym = simplify(dirkine(TableMDHsym));
-% T_T2Ssym = where_fun(T_S2B, T_W2Bsym, T_T2W);
-% X_W2Bsym = simplify(trans2pose(T_W2Bsym));
-% X_Tsym = simplify(trans2pose(T_T2Ssym));
-% 
-% Jsym = simplify(jacobian(X_Tsym, [q1 q2 q3 q4]));
-% 
-% 
-% %% Dynamical equations (symbolic expression)
-% 
-% [M, V, G, F] = dinEqs(Joint_1, Joint_2, Joint_3, Joint_4, UpperArm, ForeArm, P_T);
+%% Compute Jacobian Matrix
+
+T_W2Bsym = simplify(dirkine(TableMDHsym));
+T_T2Ssym = where_fun(T_S2B, T_W2Bsym, T_T2W);
+X_W2Bsym = simplify(trans2pose(T_W2Bsym));
+X_Tsym = simplify(trans2pose(T_T2Ssym));
+
+Jsym = simplify(jacobian(X_Tsym, [q1 q2 q3 q4]));
 
 
-%% Trajectory Generation (Stowage to Navigation)
+%% Dynamical equations (symbolic expression)
+
+[M, V, G, F] = dinEqs(Joint_1, Joint_2, Joint_3, Joint_4, UpperArm, ForeArm, P_T);
+
+%% Trajectory generation
+Qstowage=[pi/2 -pi/2 -pi/2 -pi/6];
+Qnavigation=[pi/2 -3*pi/20 -pi/6 -pi/6];
+Qretrieval=[-pi/2 -pi/2 pi/4 -pi/2];
+Qtransfer=[-pi/15 -pi/9 -5*pi/18 -pi/2]; 
+
+%% Stowage to Navigation
 TSto2Nav=10; % total time from stowage to Navigation [s]
 ft=100; % path update rate [Hz] (1/timestep)
 thetaddMax=deg2rad(30); % [rad/s^2] me la sono inventata sulla base delle slide, va aggiustata
-q0Sto2Nav=[pi/2 -pi/2 -pi/2 -pi/6]';
+q0Sto2Nav=Qstowage';
 qSto2NavInter1=[pi/2 0 -pi/2 -pi/6]';
 qSto2NavInter2=[pi/2 deg2rad(-15) deg2rad(-75) -pi/6]';
-qfSto2Nav=[pi/2 deg2rad(-20) deg2rad(-35) -pi/6]';
+qfSto2Nav=Qnavigation;
 [tq2Sto2Nav, tq3Sto2Nav, q1Sto2Nav, q2Sto2Nav, q3Sto2Nav, q4Sto2Nav,qd1Sto2Nav,...
  qd2Sto2Nav, qd3Sto2Nav, qd4Sto2Nav, qdd1Sto2Nav, qdd2Sto2Nav, qdd3Sto2Nav, qdd4Sto2Nav] = trajectoryGenerationSto2Nav...
  (q0Sto2Nav, qSto2NavInter1, qSto2NavInter2, qfSto2Nav, thetaddMax, TSto2Nav, ft);
 
 % Plot 
-figure(1)
 subplot(3,4,1)
 plot(tq2Sto2Nav,rad2deg(q1Sto2Nav),'r',lineWidth=1.5)
 xlabel('$$t$$ [s]','Interpreter','latex')
@@ -175,28 +179,14 @@ xlabel('$$t$$ [s]','Interpreter','latex')
 ylabel('$$\ddot\theta_4(t)$$ $$[^\circ/s^2]$$','Interpreter','latex')
 title('Joint acceleration 4','Interpreter','latex')
 set(gca,'FontSize',15)
+sgtitle('Stowage to Navigation', 'Interpreter','latex','FontSize',20,'FontWeight','bold');
 
-return
 %% Manipulator Visualization
-
-close all
 
 % Set the Initial Joint Variables
 global Q
 
-%stowage position
-Q=[pi/2 -pi/2 -pi/2 -pi/6];
-
-%navigation position
-Q=[pi/2 -3*pi/20 -pi/6 -pi/6];
-
-%retrieval position
-Q=[-pi/2 -pi/2 pi/4 -pi/2];
-
-%transfer position
-Q=[-pi/15 -pi/9 -5*pi/18 -pi/2]; 
-
-
+Q=Qtransfer;
 % Get Manipulator State
 [T_12S, T_22S, T_32S, T_W2S, T_T2S, X_T] = ...
     getManipulatorState(Q, TableMDHsym, X_Tsym, T_B2S, T_T2W);
