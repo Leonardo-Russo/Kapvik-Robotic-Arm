@@ -70,21 +70,21 @@ Qsym = [q1, q2, q3, q4];
 
 TableMDHsym = define_table(q1, q2, q3, q4, a2, a3, d3);
 
-fprintf("Initializing...");
-
 %% Compute Jacobian Matrix
+
+fprintf("Initializing...");
 
 T_W2Bsym = simplify(dirkine(TableMDHsym));
 T_T2Ssym = where_fun(T_S2B, T_W2Bsym, T_T2W);
 X_W2Bsym = simplify(trans2pose(T_W2Bsym));
 X_Tsym = simplify(trans2pose(T_T2Ssym));
 
-Jsym = simplify(jacobian(X_Tsym, [q1 q2 q3 q4]));
-
-
-%% Dynamical equations (symbolic expression)
-
-[M, V, G, F] = dinEqs(Joint_1, Joint_2, Joint_3, Joint_4, UpperArm, ForeArm, P_T);
+% Jsym = simplify(jacobian(X_Tsym, [q1 q2 q3 q4]));
+% 
+% 
+% %% Dynamical equations (symbolic expression)
+% 
+% [M, V, G, F] = dinEqs(Joint_1, Joint_2, Joint_3, Joint_4, UpperArm, ForeArm, P_T);
 
 %% Trajectory generation
 Qstowage=[pi/2 -pi/2 -pi/2 -pi/6];
@@ -99,82 +99,81 @@ thetaddMax=deg2rad(30); % [rad/s^2] me la sono inventata sulla base delle slide,
 q0Sto2Nav=Qstowage';
 qSto2NavInter1=[pi/2 0 -pi/2 -pi/6]';
 qSto2NavInter2=[pi/2 deg2rad(-15) deg2rad(-75) -pi/6]';
-qfSto2Nav=Qnavigation;
-[tq2Sto2Nav, tq3Sto2Nav, q1Sto2Nav, q2Sto2Nav, q3Sto2Nav, q4Sto2Nav,qd1Sto2Nav,...
- qd2Sto2Nav, qd3Sto2Nav, qd4Sto2Nav, qdd1Sto2Nav, qdd2Sto2Nav, qdd3Sto2Nav, qdd4Sto2Nav] = trajectoryGenerationSto2Nav...
- (q0Sto2Nav, qSto2NavInter1, qSto2NavInter2, qfSto2Nav, thetaddMax, TSto2Nav, ft);
+qfSto2Nav=Qnavigation';
+[t, qSto2Nav, qdSto2Nav, qddSto2Nav] = trajectoryGenerationSto2Nav...
+                                                (q0Sto2Nav, qSto2NavInter1, qSto2NavInter2, qfSto2Nav, thetaddMax, TSto2Nav, ft);
 
 % Plot 
 subplot(3,4,1)
-plot(tq2Sto2Nav,rad2deg(q1Sto2Nav),'r',lineWidth=1.5)
+plot(t,rad2deg(qSto2Nav(1,:)),'r',lineWidth=1.5)
 xlabel('$$t$$ [s]','Interpreter','latex')
 ylabel('$$\theta_1(t)$$ $$[^\circ]$$','Interpreter','latex')
 title('Joint angles 1','Interpreter','latex')
 set(gca,'FontSize',15)
 subplot(3,4,2)
-plot(tq2Sto2Nav,rad2deg(q2Sto2Nav),'b',lineWidth=1.5)
+plot(t,rad2deg(qSto2Nav(2,:)),'b',lineWidth=1.5)
 xlabel('$$t$$ [s]','Interpreter','latex')
 ylabel('$$\theta_2(t)$$ $$[^\circ]$$','Interpreter','latex')
 title('Joint angles 2','Interpreter','latex')
 set(gca,'FontSize',15)
 subplot(3,4,3)
-plot(tq3Sto2Nav,rad2deg(q3Sto2Nav),'g',lineWidth=1.5)
+plot(t,rad2deg(qSto2Nav(3,:)),'g',lineWidth=1.5)
 xlabel('$$t$$ [s]','Interpreter','latex')
 ylabel('$$\theta_3(t)$$ $$[^\circ]$$','Interpreter','latex')
 title('Joint angles 3','Interpreter','latex')
 set(gca,'FontSize',15)
 subplot(3,4,4)
-plot(tq2Sto2Nav,rad2deg(q4Sto2Nav),'m',lineWidth=1.5)
+plot(t,rad2deg(qSto2Nav(4,:)),'m',lineWidth=1.5)
 xlabel('$$t$$ [s]','Interpreter','latex')
 ylabel('$$\theta_4(t)$$ $$[^\circ]$$','Interpreter','latex')
 title('Joint angles 4','Interpreter','latex')
 set(gca,'FontSize',15)
 
 subplot(3,4,5)
-plot(tq2Sto2Nav,rad2deg(qd1Sto2Nav),'r',lineWidth=1.5)
+plot(t,rad2deg(qdSto2Nav(1,:)),'r',lineWidth=1.5)
 xlabel('$$t$$ [s]','Interpreter','latex')
 ylabel('$$\dot\theta_1(t)$$ $$[^\circ/s]$$','Interpreter','latex')
 title('Joint velocities 1','Interpreter','latex')
 set(gca,'FontSize',15)
 subplot(3,4,6)
-plot(tq2Sto2Nav,rad2deg(qd2Sto2Nav),'b',lineWidth=1.5)
+plot(t,rad2deg(qdSto2Nav(2,:)),'b',lineWidth=1.5)
 xlabel('$$t$$ [s]','Interpreter','latex')
 ylabel('$$\dot\theta_2(t)$$ $$[^\circ/s]$$','Interpreter','latex')
 title('Joint velocities 2','Interpreter','latex')
 set(gca,'FontSize',15)
 subplot(3,4,7)
-plot(tq3Sto2Nav,rad2deg(qd3Sto2Nav),'g',lineWidth=1.5)
+plot(t,rad2deg(qdSto2Nav(3,:)),'g',lineWidth=1.5)
 xlabel('$$t$$ [s]','Interpreter','latex')
 ylabel('$$\dot\theta_3(t)$$ $$[^\circ/s]$$','Interpreter','latex')
 title('Joint velocities 3','Interpreter','latex')
 set(gca,'FontSize',15)
 subplot(3,4,8)
-plot(tq2Sto2Nav,rad2deg(qd4Sto2Nav),'m',lineWidth=1.5)
+plot(t,rad2deg(qdSto2Nav(4,:)),'m',lineWidth=1.5)
 xlabel('$$t$$ [s]','Interpreter','latex')
 ylabel('$$\dot\theta_4(t)$$ $$[^\circ/s]$$','Interpreter','latex')
 title('Joint velocities 4','Interpreter','latex')
 set(gca,'FontSize',15)
 
 subplot(3,4,9)
-plot(tq2Sto2Nav,rad2deg(qdd1Sto2Nav),'r',lineWidth=1.5)
+plot(t,rad2deg(qddSto2Nav(1,:)),'r',lineWidth=1.5)
 xlabel('$$t$$ [s]','Interpreter','latex')
 ylabel('$$\ddot\theta_1(t)$$ $$[^\circ/s^2]$$','Interpreter','latex')
 title('Joint acceleration 1','Interpreter','latex')
 set(gca,'FontSize',15)
 subplot(3,4,10)
-plot(tq2Sto2Nav,rad2deg(qdd2Sto2Nav),'b',lineWidth=1.5)
+plot(t,rad2deg(qddSto2Nav(2,:)),'b',lineWidth=1.5)
 xlabel('$$t$$ [s]','Interpreter','latex')
 ylabel('$$\ddot\theta_2(t)$$ $$[^\circ/s^2]$$','Interpreter','latex')
 title('Joint acceleration 2','Interpreter','latex')
 set(gca,'FontSize',15)
 subplot(3,4,11)
-plot(tq3Sto2Nav,rad2deg(qdd3Sto2Nav),'g',lineWidth=1.5)
+plot(t,rad2deg(qddSto2Nav(3,:)),'g',lineWidth=1.5)
 xlabel('$$t$$ [s]','Interpreter','latex')
 ylabel('$$\ddot\theta_3(t)$$ $$[^\circ/s^2]$$','Interpreter','latex')
 title('Joint acceleration 3','Interpreter','latex')
 set(gca,'FontSize',15)
 subplot(3,4,12)
-plot(tq2Sto2Nav,rad2deg(qdd4Sto2Nav),'m',lineWidth=1.5)
+plot(t,rad2deg(qddSto2Nav(4,:)),'m',lineWidth=1.5)
 xlabel('$$t$$ [s]','Interpreter','latex')
 ylabel('$$\ddot\theta_4(t)$$ $$[^\circ/s^2]$$','Interpreter','latex')
 title('Joint acceleration 4','Interpreter','latex')
@@ -186,7 +185,7 @@ sgtitle('Stowage to Navigation', 'Interpreter','latex','FontSize',20,'FontWeight
 % Set the Initial Joint Variables
 global Q
 
-Q=Qtransfer;
+Q=Qstowage;
 % Get Manipulator State
 [T_12S, T_22S, T_32S, T_W2S, T_T2S, X_T] = ...
     getManipulatorState(Q, TableMDHsym, X_Tsym, T_B2S, T_T2W);
