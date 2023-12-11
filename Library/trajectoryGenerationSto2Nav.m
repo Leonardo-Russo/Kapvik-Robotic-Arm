@@ -32,22 +32,28 @@ timestep=1/ft;
 % 2-->Intermediate point 1
 % 3-->Intermediate point 2
 % 4-->Ending point
+
 thetadd1=sign(qinter1(2)-q0(2))*abs(thetadd); % second joint accelleration in the first parabolic reagion
 thetadd4=sign(qinter2(2:3)-qf(2:3))*abs(thetadd); % second and third joint accelleration in the fourth and last parabolic reagion
+
 t1=dt1-sqrt((dt1^2)-((2*(qinter1(2)-q0(2))/thetadd1))); % first blending period  
 t4=dt3-sqrt((dt3^2)-((2*(qinter2(2:3)-qf(2:3))./thetadd4))); % fourth and last blending period 
-thetad12=(qinter1(2)-q0(2))/(dt1-(t1/2)); % second velocities in the first linear reagion
+
+thetad12=(qinter1(2)-q0(2))/(dt1-(t1/2)); % second joint velocity in the first linear reagion
 thetad23=(qinter2(2:3)-qinter1(2:3))/dt2; % second and third joint velocities in the second linear reagion
 thetad34=(qf(2:3)-qinter2(2:3))./(dt3-(t4/2)); % second and third joint velocities in the third linear reagion
+
 thetadd2=sign(thetad23-[thetad12 0]')*abs(thetadd); % second and third joint accelleration in the second parabolic reagion
 thetadd3=sign(thetad34-thetad23)*abs(thetadd); % second and third joint accelleration in the third parabolic reagion
+
 t2=(thetad23-[thetad12 0]')./thetadd2; % second blending period
 t3=(thetad34-thetad23)./thetadd3; % third blending period 
+
 t12=dt1-t1-(t2/2); % first linear period 
-t23=dt2-(t2/2)-(t3/2); % third linear period
+t23=dt2-(t2/2)-(t3/2); % second linear period
 t34=dt3-t4-(t3/2); % third linear period
 
-%% First part (only q2 change)
+%% First part
 % Times vectors
 tENDpar1=t1;
 tpar1=0:timestep:tENDpar1;
@@ -105,7 +111,7 @@ for i=length(tlin1):length(tq3_1)-1
     qdd3part1(i+1)=thetadd2(2);
 end
 
-%% Second part (only q2 and q3 change)
+%% Second part
 % Times vectors
 tENDsecondSemiPar2=t2/2;
 tq2par2=(0:timestep:tENDsecondSemiPar2(1));
@@ -181,7 +187,7 @@ q3Part2(1)=[];
 qd3Part2(1)=[];
 qdd3Part2(1)=[];
 
-%% Third part (only q2 and q3 change)
+%% Third part
 % Times vectors
 tENDfirstSemiPar3=t3/2;
 tq2par3=(0:timestep:tENDfirstSemiPar3(1));
