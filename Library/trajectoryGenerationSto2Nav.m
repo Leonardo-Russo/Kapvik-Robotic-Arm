@@ -1,4 +1,4 @@
-function [Tq2, Tq3, q1, q2, q3, q4, qd1, qd2, qd3, qd4, qdd1, qdd2, qdd3, qdd4] = trajectoryGenerationSto2Nav(q0, qinter1, qinter2, qf, thetaddMAX, T, ft)
+function [t, q, qd, qdd] = trajectoryGenerationSto2Nav(q0, qinter1, qinter2, qf, thetaddMAX, T, ft)
 
 % This function computes the trajectory from q0 to qf with trapezoidal
 % method
@@ -13,11 +13,10 @@ function [Tq2, Tq3, q1, q2, q3, q4, qd1, qd2, qd3, qd4, qdd1, qdd2, qdd3, qdd4] 
 % OUTPUT:
 % t = vector of times [s] for joint, angles, velocities and acceleration in
 % the first part
-% Tq2 = vector of times [s] for q1, q2, q4, qd1, qdd2, qdd4, qdd1, qdd2, qdd4 
-% Tq3 = vector of times [s] for q3, qd3, qdd3
-% qi = vector of joints angles at each time [rad]
-% qdi = vector of joints velocities at each time [rad/s]
-% qddi = vector of joints acceleration at each time [rad/s^2]
+% t = vector of times
+% q = vector 4xN of joints angles at each time [rad]
+% qd = vector 4xN of joints velocities at each time [rad/s]
+% qdd = vector 4xN of joints acceleration at each time [rad/s^2]
 
 %% Accelleration of every joint
 thetadd=0.9*thetaddMAX;
@@ -258,19 +257,34 @@ qdd3Part3(1)=[];
 Tq2=[Tq2(1,1:end-1) Tq2(1,end)+tq2];
 Tq3=[Tq3(1,1:end-1) Tq3(1,end)+tq3];
 
-%% Joint angles, velocities and accelerations
-q1=q0(1)*ones(1,length(Tq2));
-q2=[q2part1 q2Part2 q2Part3];
-q3=[q3part1 q3Part2 q3Part3];
-q4=q0(4)*ones(1,length(Tq2));
-qd1=zeros(1,length(Tq2));
-qd2=[qd2part1 qd2Part2 qd2Part3];
-qd3=[qd3part1 qd3Part2 qd3Part3];
-qd4=zeros(1,length(Tq2));
-qdd1=zeros(1,length(Tq2));
-qdd2=[qdd2part1 qdd2Part2 qdd2Part3];
-qdd3=[qdd3part1 qdd3Part2 qdd3Part3];
-qdd4=zeros(1,length(Tq2));
+%% Unique time vector
+t=[Tq2(1:end-1) (Tq2(end):timestep:T)];
 
+%% Set the rimainder empty component of q, qd, qdd (Part 4)
+q2Part4=q2Part3(end)*ones(1,length(t)-length(Tq2));
+q3Part4=q3Part3(end)*ones(1,length(t)-length(Tq3));
+qd2Part4=zeros(1,length(t)-length(Tq2));
+qd3Part4=zeros(1,length(t)-length(Tq3));
+qdd2Part4=zeros(1,length(t)-length(Tq2));
+qdd3Part4=zeros(1,length(t)-length(Tq3));
+
+
+%% Joint angles, velocities and accelerations
+q1=q0(1)*ones(1,length(t));
+q2=[q2part1 q2Part2 q2Part3 q2Part4];
+q3=[q3part1 q3Part2 q3Part3 q3Part4];
+q4=q0(4)*ones(1,length(t));
+qd1=zeros(1,length(t));
+qd2=[qd2part1 qd2Part2 qd2Part3 qd2Part4];
+qd3=[qd3part1 qd3Part2 qd3Part3 qd3Part4];
+qd4=zeros(1,length(t));
+qdd1=zeros(1,length(t));
+qdd2=[qdd2part1 qdd2Part2 qdd2Part3 qdd2Part4];
+qdd3=[qdd3part1 qdd3Part2 qdd3Part3 qdd3Part4];
+qdd4=zeros(1,length(t));
+
+q=[q1; q2; q3; q4];
+qd=[qd1; qd2; qd3; qd4];
+qdd=[qdd1; qdd2; qdd3; qdd4];
 
 end
