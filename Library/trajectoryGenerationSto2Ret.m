@@ -59,7 +59,7 @@ t3=(thetad34-thetad23)./thetadd3; % third blending period (of second and third j
 
 t12=dt1-[t1(1) t1(2) t1(3)]'-([t2(1) t2(2) t2(3)]'/2); % first linear period (of first, second and fourth joint)
 t23=dt2-([t2(2) t2(3)]'/2)-(t3/2); % second linear period of second and third joint
-t34=dt3-t4-(t3(1)/2); % third linear period of second joint
+t34=dt3-t4-(t3/2); % third linear period of second and third joint
 
 %% First part (q1, q2, q3 and q4 change)
 % Times vectors
@@ -167,7 +167,7 @@ for i=length(tlin1q4_1):length(tq4_1)-1
     qdd4part1(i+1)=thetadd2(4);
 end
 
-%% Second part (q2, q3 and q4 change)
+%% Second part (q1, q2, q3 and q4 change)
 % Times vectors
 tENDsecondSemiPar2=t2/2;
 tq1par2=(0:timestep:tENDsecondSemiPar2(1));
@@ -299,7 +299,7 @@ q4Part2(1)=[];
 qd4Part2(1)=[];
 qdd4Part2(1)=[];
 
-%% Third part (only q2 change)
+%% Third part (only q2 and q3 change)
 % Times vectors
 tENDfirstSemiPar3=t3/2;
 tq2par3=(0:timestep:tENDfirstSemiPar3(1));
