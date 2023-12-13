@@ -38,10 +38,10 @@ UpperArm = link(0.46, 40, 2, 3.5);
 ForeArm = link(0.44, 40, 2, 3.5);
 
 % Define Joints
-Joint_1 = joint(1.15, 8.4, -160, 100, 1.5*10^(-4), -5*10^(-4), 1.44*10^(-6), 8.67, 0.84, 5.3*10^(-6), 10300, 0.025);
-Joint_2 = joint(1.28, 8.4,  -90,  90, 1.5*10^(-4), -5*10^(-4), 1.44*10^(-6), 8.67, 0.84, 5.3*10^(-6), 10300, 0.025);
-Joint_3 = joint(1.39, 5.3, -150, 110, 1.5*10^(-4), -5*10^(-4), 1.44*10^(-6), 8.67, 0.84, 5.3*10^(-6), 10300, 0.025);
-Joint_4 = joint(0.67, 6.7,  -90,   5, 1.5*10^(-4), -5*10^(-4), 1.44*10^(-6), 8.67, 0.84, 5.3*10^(-6), 10300, 0.025);
+Joint_1 = joint(1.15, 8.4*10^3, -160, 100, 1.5*10^(-4), -5*10^(-4), 1.44*10^(-6), 8.67, 0.84, 5.3*10^(-6), 10300, 0.025);
+Joint_2 = joint(1.28, 8.4*10^3,  -90,  90, 1.5*10^(-4), -5*10^(-4), 1.44*10^(-6), 8.67, 0.84, 5.3*10^(-6), 10300, 0.025);
+Joint_3 = joint(1.39, 5.3*10^3, -150, 110, 1.5*10^(-4), -5*10^(-4), 1.44*10^(-6), 8.67, 0.84, 5.3*10^(-6), 10300, 0.025);
+Joint_4 = joint(0.67, 6.7*10^3,  -90,   5, 1.5*10^(-4), -5*10^(-4), 1.44*10^(-6), 8.67, 0.84, 5.3*10^(-6), 10300, 0.025);
 
 % Define d3
 d3 = -1.5*10^(-3)*UpperArm.Diameter;
@@ -92,7 +92,10 @@ Qnavigation=[pi/2 -3*pi/20 -pi/6 -pi/6];
 Qretrieval=[-pi/2 -pi/2 pi/4 -pi/2];
 Qtransfer=[-pi/15 -pi/9 -5*pi/18 -pi/2]; 
 ft=100; % path update rate [Hz] (1/timestep)
-thetaddMax=deg2rad(30); % [rad/s^2] me la sono inventata sulla base delle slide, va aggiustata
+thetaddMax(1,1)=Joint_1.Tau_m_max/(Joint_1.Gear_Ratio*Joint_1.Motor_Inertia); % [rad/s^2] accMax joint 1
+thetaddMax(1,2)=Joint_2.Tau_m_max/(Joint_2.Gear_Ratio*Joint_2.Motor_Inertia); % [rad/s^2] accMax joint 4
+thetaddMax(1,3)=Joint_3.Tau_m_max/(Joint_3.Gear_Ratio*Joint_3.Motor_Inertia); % [rad/s^2] accMax joint 4
+thetaddMax(1,4)=Joint_4.Tau_m_max/(Joint_4.Gear_Ratio*Joint_4.Motor_Inertia); % [rad/s^2] accMax joint 4
 
 %% Stowage to Navigation
 TSto2Nav=15; % [s] total time from Stowage to Navigation
