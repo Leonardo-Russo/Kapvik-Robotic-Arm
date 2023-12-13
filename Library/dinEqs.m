@@ -7,7 +7,7 @@ sympref('AbbreviateOutput', false);
 
 JOINT=[Joint_1 Joint_2 Joint_3 Joint_4];
 % Mass property of the link
-ml=[0 0 Upper_Arm.Mass Fore_Arm.Mass 0]'; % link mass 
+ml=[0 0 Upper_Arm.Mass Fore_Arm.Mass 5]'; % link mass 
 mj=[0 Joint_1.Mass Joint_2.Mass Joint_3.Mass Joint_4.Mass]'; % joint mass
 m=ml+mj; % total mass
 I=zeros(3,3,5);
@@ -85,35 +85,43 @@ tau(5)=[];
 
 TAU=collect(simplify(tau),[q_1dd q_2dd q_3dd q_4dd g]);
 
-M=sym(ones(4,4)); % Preallocation
-V=sym(ones(4,1)); % Preallocation
-G=sym(ones(4,1)); % Preallocation
+M=sym(zeros(4,4)); % Preallocation
+G=sym(zeros(4,1)); % Preallocation
+
 for i=1:4
     for j=1:4
         mij=coeffs(TAU(i), qdd(j+1));
-        gij=coeffs(TAU(i), g);
+        gi=coeffs(TAU(i), g);
         if isempty(mij)
             M(i,j)=0;
         elseif length(mij)==2
             M(i,j)=mij(end);
         elseif length(mij)==1
             M(i,j)=0;
+        elseif length(mij) > 2
+            warning('Coeffs Sfaciola :)');
         end
-        if isempty(gij)
+        if isempty(gi)
             G(i,1)=0;
-        elseif length(gij)==2
-            G(i,1)=gij(end);
-        elseif length(gij)==1
+        elseif length(gi)==2
+            G(i,1)=gi(end);
+        elseif length(gi)==1
             G(i,1)=0;
+        elseif length(gi) > 2
+            warning('Coeffs Sfaciola :)');
         end
-    end
-    vi=coeffs(TAU(i), [q_1dd q_2dd q_3dd q_4dd g]);
-    if isempty(vi)
-        V(i,1)=0;
-    else
-        V(i,1)=vi(1);
     end
 end
+
+qsym=[q_1 q_2 q_3 q_4]';
+C=sym(zeros(4,4,4));
+c=sym(zeros(4,1));
+M=simplify(M);
+for i=1:4
+    C(:,:,i)=(1/2)*(jacobian(M(:,i),qsym)+jacobian(M(:,i),qsym)')-diff(M,qsym(i));
+    c(i)=qd(2:5)*(C(:,:,i))*qd(2:5)';
+end
+V=(c);
 
 Mm=sym(zeros(4,4)); % Preallocation
 for i=1:4
@@ -122,7 +130,7 @@ end
 
 tauF=sym(ones(4,1)); % Preallocation
 for i=1:4
-    tauF(i,1)=-(JOINT(i).Gear_Ratio^2)*JOINT(i).B_m*qd(i+1)-Tc;
+    tauF(i,1)=-(JOINT(i).Gear_Ratio^2)*JOINT(i).B_m*qd(i+1)-JOINT(i).Gear_Ratio*Tc;
 end
 
 M=M+Mm;
