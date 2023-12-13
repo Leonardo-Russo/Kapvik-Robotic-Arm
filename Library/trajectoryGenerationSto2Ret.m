@@ -33,10 +33,10 @@ timestep=1/ft;
 % 3-->Intermediate point 2
 % 4-->Ending point
 
-thetadd1(1,1)=sign(qinter1(1)-q0(1))*abs(thetadd); % first joint accelleration in the first parabolic reagion
-thetadd1(2,1)=sign(qinter1(2)-q0(2))*abs(thetadd); % second joint accelleration in the first parabolic reagion
-thetadd1(3,1)=sign(qinter1(4)-q0(4))*abs(thetadd); % fourth joint accelleration in the first parabolic reagion
-thetadd4=sign(qinter2(2:3)-qf(2:3))*abs(thetadd); % second and third joint accelleration in the fourth an last parabolic reagion
+thetadd1(1,1)=sign(qinter1(1)-q0(1))*abs(thetadd(1)); % first joint accelleration in the first parabolic reagion
+thetadd1(2,1)=sign(qinter1(2)-q0(2))*abs(thetadd(2)); % second joint accelleration in the first parabolic reagion
+thetadd1(3,1)=sign(qinter1(4)-q0(4))*abs(thetadd(4)); % fourth joint accelleration in the first parabolic reagion
+thetadd4=sign(qinter2(2:3)-qf(2:3)).*abs(thetadd(2:3)); % second and third joint accelleration in the fourth an last parabolic reagion
 
 t1(1,1)=dt1-sqrt((dt1^2)-((2*(qinter1(1)-q0(1))/thetadd1(1,1)))); % first blending period  of first joint
 t1(2,1)=dt1-sqrt((dt1^2)-((2*(qinter1(2)-q0(2))/thetadd1(2,1)))); % first blending period  of second joint
@@ -51,8 +51,8 @@ thetad23=(qinter2(2:3)-qinter1(2:3))/dt2; % second and third joint velocities in
 
 thetad34=(qf(2:3)-qinter2(2:3))./(dt3-(t4/2)); % second and third joint velocity in the third linear reagion
 
-thetadd2=sign([0; thetad23; 0]-[thetad12(1) thetad12(2) 0 thetad12(3)]')*abs(thetadd); % first, second, third and fourth joint accelleration in the second parabolic reagion
-thetadd3=sign(thetad34-thetad23)*abs(thetadd); % second and third joint accelleration in the third parabolic reagion
+thetadd2=sign([0; thetad23; 0]-[thetad12(1) thetad12(2) 0 thetad12(3)]').*abs(thetadd); % first, second, third and fourth joint accelleration in the second parabolic reagion
+thetadd3=sign(thetad34-thetad23).*abs(thetadd(2:3)); % second and third joint accelleration in the third parabolic reagion
 
 t2=([0; thetad23; 0]-[thetad12(1) thetad12(2) 0 thetad12(3)]')./thetadd2; % second blending period (of first, second, third and fourth joint)
 t3=(thetad34-thetad23)./thetadd3; % third blending period (of second and third joint)

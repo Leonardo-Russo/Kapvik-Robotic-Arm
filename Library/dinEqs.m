@@ -122,7 +122,7 @@ end
 
 tauF=sym(ones(4,1)); % Preallocation
 for i=1:4
-    tauF(i,1)=-(JOINT(i).Gear_Ratio^2)*JOINT(i).B_m*qd(i+1)-JOINT(i).Gear_Ratio*Tc;
+    tauF(i,1)=-(JOINT(i).Gear_Ratio^2)*JOINT(i).B_m*qd(i+1)-Tc;
 end
 
 M=M+Mm;
