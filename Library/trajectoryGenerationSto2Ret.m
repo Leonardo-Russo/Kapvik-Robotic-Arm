@@ -378,7 +378,7 @@ Tq3f=[Tq3(1,1:end-1) Tq3(end)+tq3];
 Tq4f=[Tq4(1,1:end-1) Tq4(end)+tq4];
 
 %% Unique time vector
-t=[Tq2(1:end-1) (Tq2(end):timestep:T)];
+t=[Tq2f(1:end-1) (Tq2f(end):timestep:T)];
 
 %% Set the rimainder empty component of q, qd, qdd (Part 4)
 q1Part34=q1Part2(end)*ones(1,length(t)-length(Tq1));

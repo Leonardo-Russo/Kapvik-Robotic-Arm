@@ -107,6 +107,7 @@ qfSto2Nav=Qnavigation';
                                                 (q0Sto2Nav, qSto2NavInter1, qSto2NavInter2, qfSto2Nav, thetaddMax, TSto2Nav, ft);
 
 % Plot 
+figure('name', 'Stowage to Navigation', 'WindowState', 'maximized')
 subplot(3,4,1)
 plot(tSto2Nav,rad2deg(qSto2Nav(1,:)),'r',lineWidth=1.5)
 xlabel('$$t$$ [s]','Interpreter','latex')
@@ -193,7 +194,7 @@ qfSto2Ret=Qretrieval';
                                                 (q0Sto2Ret, qSto2RetInter1, qSto2RetInter2, qfSto2Ret, thetaddMax, TSto2Ret, ft);
 
 % Plot 
-figure
+figure('name', 'Stowage to Retrieval', 'WindowState', 'maximized')
 subplot(3,4,1)
 plot(tSto2Ret,rad2deg(qSto2Ret(1,:)),'r',lineWidth=1.5)
 xlabel('$$t$$ [s]','Interpreter','latex')
@@ -280,7 +281,7 @@ qfRet2Trans=Qtransfer';
                                                 (q0Ret2Trans, qRet2TransInter1, qRet2TransInter2, qfRet2Trans, thetaddMax, TRet2Trans, ft);
 
 % Plot 
-figure
+figure('name', 'Retrieval to Transfer', 'WindowState', 'maximized')
 subplot(3,4,1)
 plot(tRet2Trans,rad2deg(qRet2Trans(1,:)),'r',lineWidth=1.5)
 xlabel('$$t$$ [s]','Interpreter','latex')
@@ -368,7 +369,7 @@ Q=Qtransfer;
     getManipulatorState(Q, TableMDHsym, X_Tsym, T_B2S, T_T2W);
 
 % Create the Workspace
-figure('name', 'Enviroment Simulation')
+figure('name', 'Enviroment Simulation', 'WindowState', 'maximized')
 
 % Show the Static Enviroment
 env = show_env(L, w, h);
