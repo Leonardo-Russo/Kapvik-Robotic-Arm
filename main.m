@@ -17,6 +17,9 @@ global Jsym
 
 %% Define Manipulator Properties
 
+% Precision Magnetic encoder
+sigma=deg2rad(0.025);   % rad
+
 % Define Rover Dimensions
 L = 0.7;                % m
 w = 0.5;                % m
@@ -25,8 +28,10 @@ h = 0.3;                % m
 % Define Base Shift along y
 P_By = 0.1;             % m
 
-% Define Scoop Dimension
+% Define Scoop Dimension and Inertia properties
 scoopLength = 0.05;      % m
+Mscoop=1;                % kg
+Iscoop=(2/3)*Mscoop*scoopLength^2;
 
 % Other Parameters
 a2 = 0.46;              % m
@@ -42,6 +47,13 @@ Joint_1 = joint(1.15, 8.4*10^3, -160, 100, 1.5*10^(-4), -5*10^(-4), 1.44*10^(-6)
 Joint_2 = joint(1.28, 8.4*10^3,  -90,  90, 1.5*10^(-4), -5*10^(-4), 1.44*10^(-6), 8.67, 0.84, 5.3*10^(-6), 10300, 0.025);
 Joint_3 = joint(1.39, 5.3*10^3, -150, 110, 1.5*10^(-4), -5*10^(-4), 1.44*10^(-6), 8.67, 0.84, 5.3*10^(-6), 10300, 0.025);
 Joint_4 = joint(0.67, 6.7*10^3,  -90,   5, 1.5*10^(-4), -5*10^(-4), 1.44*10^(-6), 8.67, 0.84, 5.3*10^(-6), 10300, 0.025);
+
+
+% Maximum velocity of joint motors
+omegaMax1=(10300*2*pi/60)/Joint_1.Gear_Ratio; % rad/s
+omegaMax2=(10300*2*pi/60)/Joint_2.Gear_Ratio; % rad/s
+omegaMax3=(10300*2*pi/60)/Joint_3.Gear_Ratio; % rad/s
+omegaMax4=(10300*2*pi/60)/Joint_4.Gear_Ratio; % rad/s
 
 % Define d3
 d3 = -1.5*10^(-3)*UpperArm.Diameter;
@@ -80,11 +92,10 @@ X_W2Bsym = simplify(trans2pose(T_W2Bsym));
 X_Tsym = simplify(trans2pose(T_T2Ssym));
 
 % Jsym = simplify(jacobian(X_Tsym, [q1 q2 q3 q4]));
-% 
-% 
-% %% Dynamical equations (symbolic expression)
-% 
-% [M, V, G, F] = dinEqs(Joint_1, Joint_2, Joint_3, Joint_4, UpperArm, ForeArm, P_T);
+
+%% Dynamical equations (symbolic expression)
+
+[M, V, G, F] = dinEqs(Joint_1, Joint_2, Joint_3, Joint_4, UpperArm, ForeArm, scoopLength, Mscoop, Iscoop);
 
 %% Trajectory generation
 Qstowage=[pi/2 -pi/2 -pi/2 -pi/6];
@@ -98,181 +109,30 @@ thetaddMax(1,3)=Joint_3.Tau_m_max/(Joint_3.Gear_Ratio*Joint_3.Motor_Inertia); % 
 thetaddMax(1,4)=Joint_4.Tau_m_max/(Joint_4.Gear_Ratio*Joint_4.Motor_Inertia); % [rad/s^2] accMax joint 4
 
 %% Stowage to Navigation
-TSto2Nav=15; % [s] total time from Stowage to Navigation
+TSto2Nav=25; % [s] total time from Stowage to Navigation
 q0Sto2Nav=Qstowage';
 qSto2NavInter1=[pi/2 0 -pi/2 -pi/6]';
 qSto2NavInter2=[pi/2 deg2rad(-15) deg2rad(-75) -pi/6]';
 qfSto2Nav=Qnavigation';
 [tSto2Nav, qSto2Nav, qdSto2Nav, qddSto2Nav] = trajectoryGenerationSto2Nav...
-                                                (q0Sto2Nav, qSto2NavInter1, qSto2NavInter2, qfSto2Nav, thetaddMax, TSto2Nav, ft);
-
-% Plot 
-figure('name', 'Stowage to Navigation', 'WindowState', 'maximized')
-subplot(3,4,1)
-plot(tSto2Nav,rad2deg(qSto2Nav(1,:)),'r',lineWidth=1.5)
-xlabel('$$t$$ [s]','Interpreter','latex')
-ylabel('$$\theta_1(t)$$ $$[^\circ]$$','Interpreter','latex')
-title('Joint angles 1','Interpreter','latex')
-set(gca,'FontSize',15)
-subplot(3,4,2)
-plot(tSto2Nav,rad2deg(qSto2Nav(2,:)),'b',lineWidth=1.5)
-xlabel('$$t$$ [s]','Interpreter','latex')
-ylabel('$$\theta_2(t)$$ $$[^\circ]$$','Interpreter','latex')
-title('Joint angles 2','Interpreter','latex')
-set(gca,'FontSize',15)
-subplot(3,4,3)
-plot(tSto2Nav,rad2deg(qSto2Nav(3,:)),'g',lineWidth=1.5)
-xlabel('$$t$$ [s]','Interpreter','latex')
-ylabel('$$\theta_3(t)$$ $$[^\circ]$$','Interpreter','latex')
-title('Joint angles 3','Interpreter','latex')
-set(gca,'FontSize',15)
-subplot(3,4,4)
-plot(tSto2Nav,rad2deg(qSto2Nav(4,:)),'m',lineWidth=1.5)
-xlabel('$$t$$ [s]','Interpreter','latex')
-ylabel('$$\theta_4(t)$$ $$[^\circ]$$','Interpreter','latex')
-title('Joint angles 4','Interpreter','latex')
-set(gca,'FontSize',15)
-
-subplot(3,4,5)
-plot(tSto2Nav,rad2deg(qdSto2Nav(1,:)),'r',lineWidth=1.5)
-xlabel('$$t$$ [s]','Interpreter','latex')
-ylabel('$$\dot\theta_1(t)$$ $$[^\circ/s]$$','Interpreter','latex')
-title('Joint velocities 1','Interpreter','latex')
-set(gca,'FontSize',15)
-subplot(3,4,6)
-plot(tSto2Nav,rad2deg(qdSto2Nav(2,:)),'b',lineWidth=1.5)
-xlabel('$$t$$ [s]','Interpreter','latex')
-ylabel('$$\dot\theta_2(t)$$ $$[^\circ/s]$$','Interpreter','latex')
-title('Joint velocities 2','Interpreter','latex')
-set(gca,'FontSize',15)
-subplot(3,4,7)
-plot(tSto2Nav,rad2deg(qdSto2Nav(3,:)),'g',lineWidth=1.5)
-xlabel('$$t$$ [s]','Interpreter','latex')
-ylabel('$$\dot\theta_3(t)$$ $$[^\circ/s]$$','Interpreter','latex')
-title('Joint velocities 3','Interpreter','latex')
-set(gca,'FontSize',15)
-subplot(3,4,8)
-plot(tSto2Nav,rad2deg(qdSto2Nav(4,:)),'m',lineWidth=1.5)
-xlabel('$$t$$ [s]','Interpreter','latex')
-ylabel('$$\dot\theta_4(t)$$ $$[^\circ/s]$$','Interpreter','latex')
-title('Joint velocities 4','Interpreter','latex')
-set(gca,'FontSize',15)
-
-subplot(3,4,9)
-plot(tSto2Nav,rad2deg(qddSto2Nav(1,:)),'r',lineWidth=1.5)
-xlabel('$$t$$ [s]','Interpreter','latex')
-ylabel('$$\ddot\theta_1(t)$$ $$[^\circ/s^2]$$','Interpreter','latex')
-title('Joint acceleration 1','Interpreter','latex')
-set(gca,'FontSize',15)
-subplot(3,4,10)
-plot(tSto2Nav,rad2deg(qddSto2Nav(2,:)),'b',lineWidth=1.5)
-xlabel('$$t$$ [s]','Interpreter','latex')
-ylabel('$$\ddot\theta_2(t)$$ $$[^\circ/s^2]$$','Interpreter','latex')
-title('Joint acceleration 2','Interpreter','latex')
-set(gca,'FontSize',15)
-subplot(3,4,11)
-plot(tSto2Nav,rad2deg(qddSto2Nav(3,:)),'g',lineWidth=1.5)
-xlabel('$$t$$ [s]','Interpreter','latex')
-ylabel('$$\ddot\theta_3(t)$$ $$[^\circ/s^2]$$','Interpreter','latex')
-title('Joint acceleration 3','Interpreter','latex')
-set(gca,'FontSize',15)
-subplot(3,4,12)
-plot(tSto2Nav,rad2deg(qddSto2Nav(4,:)),'m',lineWidth=1.5)
-xlabel('$$t$$ [s]','Interpreter','latex')
-ylabel('$$\ddot\theta_4(t)$$ $$[^\circ/s^2]$$','Interpreter','latex')
-title('Joint acceleration 4','Interpreter','latex')
-set(gca,'FontSize',15)
-sgtitle('Stowage to Navigation', 'Interpreter','latex','FontSize',20,'FontWeight','bold');
+                                 (q0Sto2Nav, qSto2NavInter1, qSto2NavInter2, qfSto2Nav, thetaddMax, TSto2Nav, ft);
+% Plot
+showTrajSto2Nav(tSto2Nav, qSto2Nav, qdSto2Nav, qddSto2Nav, omegaMax1, omegaMax2, omegaMax3, omegaMax4)
 
 %% Stowage to Retrieval
-TSto2Ret=15; % [s] total time from Stowage to Retrieval
+TSto2Ret=45; % [s] total time from Stowage to Retrieval
 q0Sto2Ret=Qstowage';
 qSto2RetInter1=[-pi/2 deg2rad(-5) -pi/2 -pi/2]';
 qSto2RetInter2=[-pi/2 deg2rad(-30) deg2rad(-60) -pi/2]';
 qfSto2Ret=Qretrieval';
 [tSto2Ret, qSto2Ret, qdSto2Ret, qddSto2Ret] = trajectoryGenerationSto2Ret...
-                                                (q0Sto2Ret, qSto2RetInter1, qSto2RetInter2, qfSto2Ret, thetaddMax, TSto2Ret, ft);
+                                 (q0Sto2Ret, qSto2RetInter1, qSto2RetInter2, qfSto2Ret, thetaddMax, TSto2Ret, ft);
 
 % Plot 
-figure('name', 'Stowage to Retrieval', 'WindowState', 'maximized')
-subplot(3,4,1)
-plot(tSto2Ret,rad2deg(qSto2Ret(1,:)),'r',lineWidth=1.5)
-xlabel('$$t$$ [s]','Interpreter','latex')
-ylabel('$$\theta_1(t)$$ $$[^\circ]$$','Interpreter','latex')
-title('Joint angles 1','Interpreter','latex')
-set(gca,'FontSize',15)
-subplot(3,4,2)
-plot(tSto2Ret,rad2deg(qSto2Ret(2,:)),'b',lineWidth=1.5)
-xlabel('$$t$$ [s]','Interpreter','latex')
-ylabel('$$\theta_2(t)$$ $$[^\circ]$$','Interpreter','latex')
-title('Joint angles 2','Interpreter','latex')
-set(gca,'FontSize',15)
-subplot(3,4,3)
-plot(tSto2Ret,rad2deg(qSto2Ret(3,:)),'g',lineWidth=1.5)
-xlabel('$$t$$ [s]','Interpreter','latex')
-ylabel('$$\theta_3(t)$$ $$[^\circ]$$','Interpreter','latex')
-title('Joint angles 3','Interpreter','latex')
-set(gca,'FontSize',15)
-subplot(3,4,4)
-plot(tSto2Ret,rad2deg(qSto2Ret(4,:)),'m',lineWidth=1.5)
-xlabel('$$t$$ [s]','Interpreter','latex')
-ylabel('$$\theta_4(t)$$ $$[^\circ]$$','Interpreter','latex')
-title('Joint angles 4','Interpreter','latex')
-set(gca,'FontSize',15)
-
-subplot(3,4,5)
-plot(tSto2Ret,rad2deg(qdSto2Ret(1,:)),'r',lineWidth=1.5)
-xlabel('$$t$$ [s]','Interpreter','latex')
-ylabel('$$\dot\theta_1(t)$$ $$[^\circ/s]$$','Interpreter','latex')
-title('Joint velocities 1','Interpreter','latex')
-set(gca,'FontSize',15)
-subplot(3,4,6)
-plot(tSto2Ret,rad2deg(qdSto2Ret(2,:)),'b',lineWidth=1.5)
-xlabel('$$t$$ [s]','Interpreter','latex')
-ylabel('$$\dot\theta_2(t)$$ $$[^\circ/s]$$','Interpreter','latex')
-title('Joint velocities 2','Interpreter','latex')
-set(gca,'FontSize',15)
-subplot(3,4,7)
-plot(tSto2Ret,rad2deg(qdSto2Ret(3,:)),'g',lineWidth=1.5)
-xlabel('$$t$$ [s]','Interpreter','latex')
-ylabel('$$\dot\theta_3(t)$$ $$[^\circ/s]$$','Interpreter','latex')
-title('Joint velocities 3','Interpreter','latex')
-set(gca,'FontSize',15)
-subplot(3,4,8)
-plot(tSto2Ret,rad2deg(qdSto2Ret(4,:)),'m',lineWidth=1.5)
-xlabel('$$t$$ [s]','Interpreter','latex')
-ylabel('$$\dot\theta_4(t)$$ $$[^\circ/s]$$','Interpreter','latex')
-title('Joint velocities 4','Interpreter','latex')
-set(gca,'FontSize',15)
-
-subplot(3,4,9)
-plot(tSto2Ret,rad2deg(qddSto2Ret(1,:)),'r',lineWidth=1.5)
-xlabel('$$t$$ [s]','Interpreter','latex')
-ylabel('$$\ddot\theta_1(t)$$ $$[^\circ/s^2]$$','Interpreter','latex')
-title('Joint acceleration 1','Interpreter','latex')
-set(gca,'FontSize',15)
-subplot(3,4,10)
-plot(tSto2Ret,rad2deg(qddSto2Ret(2,:)),'b',lineWidth=1.5)
-xlabel('$$t$$ [s]','Interpreter','latex')
-ylabel('$$\ddot\theta_2(t)$$ $$[^\circ/s^2]$$','Interpreter','latex')
-title('Joint acceleration 2','Interpreter','latex')
-set(gca,'FontSize',15)
-subplot(3,4,11)
-plot(tSto2Ret,rad2deg(qddSto2Ret(3,:)),'g',lineWidth=1.5)
-xlabel('$$t$$ [s]','Interpreter','latex')
-ylabel('$$\ddot\theta_3(t)$$ $$[^\circ/s^2]$$','Interpreter','latex')
-title('Joint acceleration 3','Interpreter','latex')
-set(gca,'FontSize',15)
-subplot(3,4,12)
-plot(tSto2Ret,rad2deg(qddSto2Ret(4,:)),'m',lineWidth=1.5)
-xlabel('$$t$$ [s]','Interpreter','latex')
-ylabel('$$\ddot\theta_4(t)$$ $$[^\circ/s^2]$$','Interpreter','latex')
-title('Joint acceleration 4','Interpreter','latex')
-set(gca,'FontSize',15)
-sgtitle('Stowage to Retrieval', 'Interpreter','latex','FontSize',20,'FontWeight','bold');
+showTrajSto2Ret(tSto2Ret, qSto2Ret, qdSto2Ret, qddSto2Ret, omegaMax1, omegaMax2, omegaMax3, omegaMax4)
 
 %% Retrieval to Transfer
-TRet2Trans=15; % [s] total time from Retrieval to Transfer
+TRet2Trans=40; % [s] total time from Retrieval to Transfer
 q0Ret2Trans=Qretrieval';
 qRet2TransInter1=[Qretrieval(1:3) deg2rad(5)]';
 qRet2TransInter2=[Qtransfer(1:3) deg2rad(5)]';
@@ -280,83 +140,56 @@ qfRet2Trans=Qtransfer';
 [tRet2Trans, qRet2Trans, qdRet2Trans, qddRet2Trans] = trajectoryGenerationRet2Trans...
                                                 (q0Ret2Trans, qRet2TransInter1, qRet2TransInter2, qfRet2Trans, thetaddMax, TRet2Trans, ft);
 
-% Plot 
-figure('name', 'Retrieval to Transfer', 'WindowState', 'maximized')
-subplot(3,4,1)
-plot(tRet2Trans,rad2deg(qRet2Trans(1,:)),'r',lineWidth=1.5)
-xlabel('$$t$$ [s]','Interpreter','latex')
-ylabel('$$\theta_1(t)$$ $$[^\circ]$$','Interpreter','latex')
-title('Joint angles 1','Interpreter','latex')
-set(gca,'FontSize',15)
-subplot(3,4,2)
-plot(tRet2Trans,rad2deg(qRet2Trans(2,:)),'b',lineWidth=1.5)
-xlabel('$$t$$ [s]','Interpreter','latex')
-ylabel('$$\theta_2(t)$$ $$[^\circ]$$','Interpreter','latex')
-title('Joint angles 2','Interpreter','latex')
-set(gca,'FontSize',15)
-subplot(3,4,3)
-plot(tRet2Trans,rad2deg(qRet2Trans(3,:)),'g',lineWidth=1.5)
-xlabel('$$t$$ [s]','Interpreter','latex')
-ylabel('$$\theta_3(t)$$ $$[^\circ]$$','Interpreter','latex')
-title('Joint angles 3','Interpreter','latex')
-set(gca,'FontSize',15)
-subplot(3,4,4)
-plot(tRet2Trans,rad2deg(qRet2Trans(4,:)),'m',lineWidth=1.5)
-xlabel('$$t$$ [s]','Interpreter','latex')
-ylabel('$$\theta_4(t)$$ $$[^\circ]$$','Interpreter','latex')
-title('Joint angles 4','Interpreter','latex')
-set(gca,'FontSize',15)
+% % Plot 
+% showTrajRet2Trans(tRet2Trans, qRet2Trans, qdRet2Trans, qddRet2Trans, omegaMax1, omegaMax2, omegaMax3, omegaMax4)
 
-subplot(3,4,5)
-plot(tRet2Trans,rad2deg(qdRet2Trans(1,:)),'r',lineWidth=1.5)
-xlabel('$$t$$ [s]','Interpreter','latex')
-ylabel('$$\dot\theta_1(t)$$ $$[^\circ/s]$$','Interpreter','latex')
-title('Joint velocities 1','Interpreter','latex')
-set(gca,'FontSize',15)
-subplot(3,4,6)
-plot(tRet2Trans,rad2deg(qdRet2Trans(2,:)),'b',lineWidth=1.5)
-xlabel('$$t$$ [s]','Interpreter','latex')
-ylabel('$$\dot\theta_2(t)$$ $$[^\circ/s]$$','Interpreter','latex')
-title('Joint velocities 2','Interpreter','latex')
-set(gca,'FontSize',15)
-subplot(3,4,7)
-plot(tRet2Trans,rad2deg(qdRet2Trans(3,:)),'g',lineWidth=1.5)
-xlabel('$$t$$ [s]','Interpreter','latex')
-ylabel('$$\dot\theta_3(t)$$ $$[^\circ/s]$$','Interpreter','latex')
-title('Joint velocities 3','Interpreter','latex')
-set(gca,'FontSize',15)
-subplot(3,4,8)
-plot(tRet2Trans,rad2deg(qdRet2Trans(4,:)),'m',lineWidth=1.5)
-xlabel('$$t$$ [s]','Interpreter','latex')
-ylabel('$$\dot\theta_4(t)$$ $$[^\circ/s]$$','Interpreter','latex')
-title('Joint velocities 4','Interpreter','latex')
-set(gca,'FontSize',15)
-
-subplot(3,4,9)
-plot(tRet2Trans,rad2deg(qddRet2Trans(1,:)),'r',lineWidth=1.5)
-xlabel('$$t$$ [s]','Interpreter','latex')
-ylabel('$$\ddot\theta_1(t)$$ $$[^\circ/s^2]$$','Interpreter','latex')
-title('Joint acceleration 1','Interpreter','latex')
-set(gca,'FontSize',15)
-subplot(3,4,10)
-plot(tRet2Trans,rad2deg(qddRet2Trans(2,:)),'b',lineWidth=1.5)
-xlabel('$$t$$ [s]','Interpreter','latex')
-ylabel('$$\ddot\theta_2(t)$$ $$[^\circ/s^2]$$','Interpreter','latex')
-title('Joint acceleration 2','Interpreter','latex')
-set(gca,'FontSize',15)
-subplot(3,4,11)
-plot(tRet2Trans,rad2deg(qddRet2Trans(3,:)),'g',lineWidth=1.5)
-xlabel('$$t$$ [s]','Interpreter','latex')
-ylabel('$$\ddot\theta_3(t)$$ $$[^\circ/s^2]$$','Interpreter','latex')
-title('Joint acceleration 3','Interpreter','latex')
-set(gca,'FontSize',15)
-subplot(3,4,12)
-plot(tRet2Trans,rad2deg(qddRet2Trans(4,:)),'m',lineWidth=1.5)
-xlabel('$$t$$ [s]','Interpreter','latex')
-ylabel('$$\ddot\theta_4(t)$$ $$[^\circ/s^2]$$','Interpreter','latex')
-title('Joint acceleration 4','Interpreter','latex')
-set(gca,'FontSize',15)
-sgtitle('Retrieval to Transfer', 'Interpreter','latex','FontSize',20,'FontWeight','bold');
+% %% Control Stowage to Navigation
+% % C.I
+% M0=MassMatrix(Qstowage(1), Qstowage(2), Qstowage(3), Qstowage(4));
+% V0=Coriolis(Qstowage(1), Qstowage(2), Qstowage(3), Qstowage(4), 0, 0, 0, 0);
+% G0=Gravity(Qstowage(1), Qstowage(2), Qstowage(3), Qstowage(4));
+% if Qstowage(1)>0
+%     Tcoul1=Joint_1.Friction_Torque_max;
+% else
+%     Tcoul1=Joint_1.Friction_Torque_min;
+% end
+% if Qstowage(2)>0
+%     Tcoul2=Joint_2.Friction_Torque_max;
+% else
+%     Tcoul2=Joint_2.Friction_Torque_min;
+% end
+% if Qstowage(3)>0
+%     Tcoul3=Joint_3.Friction_Torque_max;
+% else
+%     Tcoul3=Joint_3.Friction_Torque_min;
+% end
+% if Qstowage(4)>0
+%     Tcoul4=Joint_4.Friction_Torque_max;
+% else
+%     Tcoul4=Joint_4.Friction_Torque_min;
+% end
+% F0=Friction(0, 0, 0, 0, Tcoul1, Tcoul2, Tcoul3, Tcoul4);
+% 
+% % Settling time
+% ts=100;
+% 
+% % Gain
+% kv=-2*log(sigma)/ts;
+% kp=(kv/2)^2;
+% Kv=kv*eye(4);
+% Kp=kp*eye(4);
+% 
+% % Integration
+% fc=1000;
+% [tcSto2Nav, thetaSto2Nav, thetadSto2Nav, thetaddSto2Nav, qDesSto2Nav, qdDesSto2Nav,...
+%     qddDesSto2Nav, ESto2Nav, tauSto2Nav, tauMotorSto2Nav, iMotor] = control(TSto2Nav, Qstowage', [0 0 0 0]', ...
+%                                       M0, V0, G0, F0, fc, ft, qSto2Nav, qdSto2Nav,...
+%                                       qddSto2Nav,Joint_1, Joint_2, Joint_3, Joint_4, Kv, Kp);
+% 
+% % Plot
+% showControlSto2Nav(tcSto2Nav, thetaSto2Nav, thetadSto2Nav, thetaddSto2Nav, qDesSto2Nav,qdDesSto2Nav,...
+%     qddDesSto2Nav, ESto2Nav, tauSto2Nav, tauMotorSto2Nav, iMotor, Joint_1.Tau_m_max, Joint_1.i_tau_m_max)
+% return
 
 %% Manipulator Visualization
 

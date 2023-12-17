@@ -1,18 +1,18 @@
-function [M, V, G, tauF] = dinEqs(Joint_1, Joint_2, Joint_3, Joint_4, Upper_Arm, Fore_Arm, P_T)
+function [M, V, G, tauF] = dinEqs(Joint_1, Joint_2, Joint_3, Joint_4, Upper_Arm, Fore_Arm, P_T, Mscoop, Iscoop)
 % Dynamic eqs 
 
 format long
-syms q_1 q_2 q_3 q_4 q_1d q_2d q_3d q_4d q_1dd q_2dd q_3dd q_4dd g Tc real
+syms q_1 q_2 q_3 q_4 q_1d q_2d q_3d q_4d q_1dd q_2dd q_3dd q_4dd g Tc1 Tc2 Tc3 Tc4 real
 sympref('AbbreviateOutput', false);
-
 JOINT=[Joint_1 Joint_2 Joint_3 Joint_4];
 % Mass property of the link
-ml=[0 0 Upper_Arm.Mass Fore_Arm.Mass 5]'; % link mass 
+ml=[0 0 Upper_Arm.Mass Fore_Arm.Mass Mscoop]'; % link mass 
 mj=[0 Joint_1.Mass Joint_2.Mass Joint_3.Mass Joint_4.Mass]'; % joint mass
 m=ml+mj; % total mass
 I=zeros(3,3,5);
 I(:,:,3)=Upper_Arm.Inertia;
 I(:,:,4)=Fore_Arm.Inertia;
+I(:,:,5)=Iscoop;
 
 % Rotation matrix beetween reference frame
 R_B21=R3(q_1);
@@ -43,7 +43,7 @@ P_02c0=[0 0 0]'; % from base to cdm of link beetween base and joint 1, expressed
 P_12c1=[0 0 0]'; % from joint 1 to cdm of link beetween joint 1 and joint 2, expressed in the sdr 1
 P_22c2=[(Upper_Arm.Length/2)*(ml(3)/m(3)) 0 0]'; % from joint 2 to cdm of link beetween joint 2 and joint 3, expressed in the sdr 2
 P_32c3=[(Fore_Arm.Length/2)*(ml(4)/m(4)) 0 0]'; % from joint 3 to cdm of link beetween joint 3 and joint 4, expressed in the sdr 3
-P_42c4=[0 0 0]'; % from joint 4 to cdm of the escavator, expressed in the sdr 4 (wrist frame)
+P_42c4=[P_T(1)/2 0 0]'; % from joint 4 to cdm of the escavator, expressed in the sdr 4 (wrist frame)
 Pc(:,1)=P_02c0;
 Pc(:,2)=P_12c1;
 Pc(:,3)=P_22c2;
@@ -130,7 +130,16 @@ end
 
 tauF=sym(ones(4,1)); % Preallocation
 for i=1:4
-    tauF(i,1)=-(JOINT(i).Gear_Ratio^2)*JOINT(i).B_m*qd(i+1)-JOINT(i).Gear_Ratio*Tc;
+    if i==1
+        Tcoul=Tc1;
+    elseif i==2
+        Tcoul=Tc2;
+    elseif i==3
+        Tcoul=Tc3;
+    elseif i==4
+        Tcoul=Tc4;
+    end
+    tauF(i,1)=-(JOINT(i).Gear_Ratio^2)*JOINT(i).B_m*qd(i+1)-Tcoul;
 end
 
 M=M+Mm;
