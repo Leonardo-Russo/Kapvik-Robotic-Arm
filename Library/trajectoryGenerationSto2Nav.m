@@ -22,9 +22,9 @@ function [t, q, qd, qdd] = trajectoryGenerationSto2Nav(q0, qinter1, qinter2, qf,
 thetadd=0.9*thetaddMAX;
 
 %% Times
-dt1=0.5*T; % time from start point 1 to the intermediate point 1
-dt2=0.2*T; % time from the intermediate point 1 to the intermediate point 2
-dt3=0.3*T; % time from intermediate point 2 to final point 3
+dt1=0.7*T; % time from start point 1 to the intermediate point 1
+dt2=0.1*T; % time from the intermediate point 1 to the intermediate point 2
+dt3=0.2*T; % time from intermediate point 2 to final point 3
 timestep=1/ft;
 
 %% parabola(1)-linear-parabola(2)-linear-parabola(3)-linear-parabola(4)
