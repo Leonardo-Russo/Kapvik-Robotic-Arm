@@ -1,4 +1,4 @@
-function updatePlot(src, ~, TableMDHsym, X_Tsym, T_B2S, T_T2W, joints, links, scoop, mframes, jframes, options, Upper_Arm, Fore_Arm, scoopLength, tTrajectory, qTrajectory, ft)
+function updatePlot(TableMDHsym, X_Tsym, T_B2S, T_T2W, joints, links, scoop, mframes, jframes, options, Upper_Arm, Fore_Arm, scoopLength, tTrajectory, qTrajectory, ft)
 
 global Q Qsym
 % 

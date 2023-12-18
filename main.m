@@ -250,15 +250,15 @@ set(boringButton, 'Callback', {@strobEffectCallback, lgt});
 %% trajectory display
 %stowage to navigation
 sto2navButton = uicontrol('Style', 'pushbutton', 'String', 'Sto2Nav', 'Position', [250 20 100 20]);
-set(sto2navButton, 'Callback',  {@(src,event) updatePlot([], [], TableMDHsym, X_Tsym, T_B2S, T_T2W, joints, links, scoop, mframes, jframes, options, UpperArm, ForeArm, scoopLength, tSto2Nav, qSto2Nav, ft)});
+set(sto2navButton, 'Callback',  {@(src,event) updatePlot(TableMDHsym, X_Tsym, T_B2S, T_T2W, joints, links, scoop, mframes, jframes, options, UpperArm, ForeArm, scoopLength, tSto2Nav, qSto2Nav, ft)});
 
 %stowage to retrieval
 sto2retrButton = uicontrol('Style', 'pushbutton', 'String', 'Sto2Retr', 'Position', [360 20 100 20]);
-set(sto2retrButton, 'Callback',  {@(src,event) updatePlot([], [], TableMDHsym, X_Tsym, T_B2S, T_T2W, joints, links, scoop, mframes, jframes, options, UpperArm, ForeArm, scoopLength, tSto2Ret, qSto2Ret, ft)});
+set(sto2retrButton, 'Callback',  {@(src,event) updatePlot(TableMDHsym, X_Tsym, T_B2S, T_T2W, joints, links, scoop, mframes, jframes, options, UpperArm, ForeArm, scoopLength, tSto2Ret, qSto2Ret, ft)});
 
 %retrieval to transfer
 ret2transButton = uicontrol('Style', 'pushbutton', 'String', 'Retr2Transf', 'Position', [470 20 100 20]);
-set(ret2transButton, 'Callback',  {@(src,event) updatePlot([], [], TableMDHsym, X_Tsym, T_B2S, T_T2W, joints, links, scoop, mframes, jframes, options, UpperArm, ForeArm, scoopLength, tRet2Trans, qRet2Trans, ft)});
+set(ret2transButton, 'Callback',  {@(src,event) updatePlot(TableMDHsym, X_Tsym, T_B2S, T_T2W, joints, links, scoop, mframes, jframes, options, UpperArm, ForeArm, scoopLength, tRet2Trans, qRet2Trans, ft)});
 
 
 % % Create a Panel to Group Sliders and Labels
