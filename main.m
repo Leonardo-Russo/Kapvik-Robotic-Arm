@@ -170,11 +170,13 @@ else
 end
 F0=Friction(0, 0, 0, 0, Tcoul1, Tcoul2, Tcoul3, Tcoul4);
 
-% Settling time
-ts=1;
-
-% Gain
-kv=-2*log(0.05)/ts;
+% % Settling time
+% ts=0.01;
+% 
+% % Gain
+% kv=-2*log(0.05)/ts;
+% kp=(kv/2)^2;
+kv=15;
 kp=(kv/2)^2;
 Kv=kv*eye(4);
 Kp=kp*eye(4);

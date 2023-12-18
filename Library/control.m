@@ -51,9 +51,12 @@ for i=1:length(t)
         
     else
 
-        M=MassMatrix(theta(1,i-1), theta(2,i-1), theta(3,i-1), theta(4,i-1));
-        V=Coriolis(theta(1,i-1), theta(2,i-1), theta(3,i-1), theta(4,i-1), thetad(1,i-1), thetad(2,i-1), thetad(3,i-1), thetad(4,i-1));
-        G=Gravity(theta(1,i-1), theta(2,i-1), theta(3,i-1), theta(4,i-1));
+        thetad(:,i)=thetad(:,i-1)+thetadd(:,i-1)*dt;
+        theta(:,i)=theta(:,i-1)+thetad(:,i-1)*dt+(0.5)*thetadd(:,i-1)*dt^2;
+
+        M=MassMatrix(theta(1,i), theta(2,i), theta(3,i), theta(4,i));
+        V=Coriolis(theta(1,i), theta(2,i), theta(3,i), theta(4,i), thetad(1,i), thetad(2,i), thetad(3,i), thetad(4,i));
+        G=Gravity(theta(1,i), theta(2,i), theta(3,i), theta(4,i));
         
         if theta(1,i)>0
             Tcoul1=Joint_1.Friction_Torque_max;
@@ -76,16 +79,15 @@ for i=1:length(t)
             Tcoul4=Joint_4.Friction_Torque_min;
         end
         
-        F=Friction(theta(1,i-1), theta(2,i-1), theta(3,i-1), theta(4,i-1), Tcoul1, Tcoul2, Tcoul3, Tcoul4);
+        F=Friction(theta(1,i), theta(2,i), theta(3,i), theta(4,i), Tcoul1, Tcoul2, Tcoul3, Tcoul4);
         alfa=M;
         beta=V+G+F;
-        Edot(:,i)=qdDes(:,i-1)-theta(:,i-1);
-        E(:,i)=qDes(:,i-1)-theta(:,i-1);
+        Edot(:,i)=qdDes(:,i)-theta(:,i);
+        E(:,i)=qDes(:,i)-theta(:,i);
         tauP(:,i)=qddDes(:,i)+Kv*Edot(:,i)+Kp*E(:,i);
         tau(:,i)=alfa*tauP(:,i)+beta;
         thetadd(:,i)=M\(tau(:,i)-V-G-F);
-        thetad(:,i)=thetad(:,i-1)+thetadd(:,i-1)*dt;
-        theta(:,i)=theta(:,i-1)+thetad(:,i-1)*dt+(0.5)*thetadd(:,i-1)*dt^2;
+        
     end
 
 end
