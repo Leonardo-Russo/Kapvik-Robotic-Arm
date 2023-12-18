@@ -84,7 +84,7 @@ TableMDHsym = define_table(q1, q2, q3, q4, a2, a3, d3);
 
 %% Compute Jacobian Matrix
 
-fprintf("Initializing...");
+fprintf("Initializing...\n");
 
 T_W2Bsym = simplify(dirkine(TableMDHsym));
 T_T2Ssym = where_fun(T_S2B, T_W2Bsym, T_T2W);
@@ -116,8 +116,8 @@ qSto2NavInter2=[pi/2 deg2rad(-15) deg2rad(-75) -pi/6]';
 qfSto2Nav=Qnavigation';
 [tSto2Nav, qSto2Nav, qdSto2Nav, qddSto2Nav] = trajectoryGenerationSto2Nav...
                                  (q0Sto2Nav, qSto2NavInter1, qSto2NavInter2, qfSto2Nav, thetaddMax, TSto2Nav, ft);
-% Plot
-showTrajSto2Nav(tSto2Nav, qSto2Nav, qdSto2Nav, qddSto2Nav, omegaMax1, omegaMax2, omegaMax3, omegaMax4)
+% % Plot
+% showTrajSto2Nav(tSto2Nav, qSto2Nav, qdSto2Nav, qddSto2Nav, omegaMax1, omegaMax2, omegaMax3, omegaMax4)
 
 %% Stowage to Retrieval
 TSto2Ret=45; % [s] total time from Stowage to Retrieval
@@ -128,8 +128,8 @@ qfSto2Ret=Qretrieval';
 [tSto2Ret, qSto2Ret, qdSto2Ret, qddSto2Ret] = trajectoryGenerationSto2Ret...
                                  (q0Sto2Ret, qSto2RetInter1, qSto2RetInter2, qfSto2Ret, thetaddMax, TSto2Ret, ft);
 
-% Plot 
-showTrajSto2Ret(tSto2Ret, qSto2Ret, qdSto2Ret, qddSto2Ret, omegaMax1, omegaMax2, omegaMax3, omegaMax4)
+% % Plot 
+% showTrajSto2Ret(tSto2Ret, qSto2Ret, qdSto2Ret, qddSto2Ret, omegaMax1, omegaMax2, omegaMax3, omegaMax4)
 
 %% Retrieval to Transfer
 TRet2Trans=40; % [s] total time from Retrieval to Transfer
@@ -143,53 +143,53 @@ qfRet2Trans=Qtransfer';
 % % Plot 
 % showTrajRet2Trans(tRet2Trans, qRet2Trans, qdRet2Trans, qddRet2Trans, omegaMax1, omegaMax2, omegaMax3, omegaMax4)
 
-% %% Control Stowage to Navigation
-% % C.I
-% M0=MassMatrix(Qstowage(1), Qstowage(2), Qstowage(3), Qstowage(4));
-% V0=Coriolis(Qstowage(1), Qstowage(2), Qstowage(3), Qstowage(4), 0, 0, 0, 0);
-% G0=Gravity(Qstowage(1), Qstowage(2), Qstowage(3), Qstowage(4));
-% if Qstowage(1)>0
-%     Tcoul1=Joint_1.Friction_Torque_max;
-% else
-%     Tcoul1=Joint_1.Friction_Torque_min;
-% end
-% if Qstowage(2)>0
-%     Tcoul2=Joint_2.Friction_Torque_max;
-% else
-%     Tcoul2=Joint_2.Friction_Torque_min;
-% end
-% if Qstowage(3)>0
-%     Tcoul3=Joint_3.Friction_Torque_max;
-% else
-%     Tcoul3=Joint_3.Friction_Torque_min;
-% end
-% if Qstowage(4)>0
-%     Tcoul4=Joint_4.Friction_Torque_max;
-% else
-%     Tcoul4=Joint_4.Friction_Torque_min;
-% end
-% F0=Friction(0, 0, 0, 0, Tcoul1, Tcoul2, Tcoul3, Tcoul4);
-% 
-% % Settling time
-% ts=100;
-% 
-% % Gain
-% kv=-2*log(sigma)/ts;
-% kp=(kv/2)^2;
-% Kv=kv*eye(4);
-% Kp=kp*eye(4);
-% 
-% % Integration
-% fc=1000;
-% [tcSto2Nav, thetaSto2Nav, thetadSto2Nav, thetaddSto2Nav, qDesSto2Nav, qdDesSto2Nav,...
-%     qddDesSto2Nav, ESto2Nav, tauSto2Nav, tauMotorSto2Nav, iMotor] = control(TSto2Nav, Qstowage', [0 0 0 0]', ...
-%                                       M0, V0, G0, F0, fc, ft, qSto2Nav, qdSto2Nav,...
-%                                       qddSto2Nav,Joint_1, Joint_2, Joint_3, Joint_4, Kv, Kp);
-% 
-% % Plot
-% showControlSto2Nav(tcSto2Nav, thetaSto2Nav, thetadSto2Nav, thetaddSto2Nav, qDesSto2Nav,qdDesSto2Nav,...
-%     qddDesSto2Nav, ESto2Nav, tauSto2Nav, tauMotorSto2Nav, iMotor, Joint_1.Tau_m_max, Joint_1.i_tau_m_max)
-% return
+%% Control Stowage to Navigation
+% C.I
+M0=MassMatrix(Qstowage(1), Qstowage(2), Qstowage(3), Qstowage(4));
+V0=Coriolis(Qstowage(1), Qstowage(2), Qstowage(3), Qstowage(4), 0, 0, 0, 0);
+G0=Gravity(Qstowage(1), Qstowage(2), Qstowage(3), Qstowage(4));
+if Qstowage(1)>0
+    Tcoul1=Joint_1.Friction_Torque_max;
+else
+    Tcoul1=Joint_1.Friction_Torque_min;
+end
+if Qstowage(2)>0
+    Tcoul2=Joint_2.Friction_Torque_max;
+else
+    Tcoul2=Joint_2.Friction_Torque_min;
+end
+if Qstowage(3)>0
+    Tcoul3=Joint_3.Friction_Torque_max;
+else
+    Tcoul3=Joint_3.Friction_Torque_min;
+end
+if Qstowage(4)>0
+    Tcoul4=Joint_4.Friction_Torque_max;
+else
+    Tcoul4=Joint_4.Friction_Torque_min;
+end
+F0=Friction(0, 0, 0, 0, Tcoul1, Tcoul2, Tcoul3, Tcoul4);
+
+% Settling time
+ts=1e15;
+
+% Gain
+kv=-2*log(0.05)/ts;
+kp=(kv/2)^2;
+Kv=kv*eye(4);
+Kp=kp*eye(4);
+
+% Integration
+fc=1000;
+[tcSto2Nav, thetaSto2Nav, thetadSto2Nav, thetaddSto2Nav, qDesSto2Nav, qdDesSto2Nav,...
+    qddDesSto2Nav, ESto2Nav, tauSto2Nav, tauMotorSto2Nav, iMotor] = control(TSto2Nav, Qstowage', [0 0 0 0]', ...
+                                      M0, V0, G0, F0, fc, ft, qSto2Nav, qdSto2Nav,...
+                                      qddSto2Nav,Joint_1, Joint_2, Joint_3, Joint_4, Kv, Kp);
+
+% Plot
+showControlSto2Nav(tcSto2Nav, thetaSto2Nav, thetadSto2Nav, thetaddSto2Nav, qDesSto2Nav,qdDesSto2Nav,...
+    qddDesSto2Nav, ESto2Nav, tauSto2Nav, tauMotorSto2Nav, iMotor, Joint_1.Tau_m_max, Joint_1.i_tau_m_max)
+return
 
 %% Manipulator Visualization
 

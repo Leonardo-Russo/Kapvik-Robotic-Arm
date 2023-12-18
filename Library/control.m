@@ -27,23 +27,25 @@ thetad=zeros(4,length(t));
 thetadd=zeros(4,length(t));
 tau=zeros(4,length(t));
 E=zeros(4,length(t));
+Edot=zeros(4,length(t));
+tauP=zeros(4,length(t));
 
 %% Integrazione (metodo di Eulero)
 for i=1:length(t)
     if i==1
         alfa=M0;
         beta=V0+G0+F0;
-        Edot=qdDes(:,1)-thetad(:,1);
+        Edot(:,1)=qdDes(:,1)-thetad(:,1);
         E(:,1)=qDes(:,1)-theta(:,1);
-        tauP=qddDes(:,1)+Kv*Edot+Kp*E(:,1);
-        tau(:,1)=alfa*tauP+beta;
+        tauP(:,1)=qddDes(:,1)+Kv*Edot(:,1)+Kp*E(:,1);
+        tau(:,1)=alfa*tauP(:,1)+beta;
         thetadd(:,1)=M0\(tau(:,1)-V0-G0-F0);
         thetad(:,1)=thetad0;
         theta(:,1)=theta0;
     else
-        M=MassMatrix(theta(1,i), theta(2,i), theta(3,i), theta(4,i));
-        V=Coriolis(theta(1,i), theta(2,i), theta(3,i), theta(4,i), thetad(1,i), thetad(2,i), thetad(3,i), thetad(4,i));
-        G=Gravity(theta(1,i), theta(2,i), theta(3,i), theta(4,i));
+        M=MassMatrix(theta(1,i-1), theta(2,i-1), theta(3,i-1), theta(4,i-1));
+        V=Coriolis(theta(1,i-1), theta(2,i-1), theta(3,i-1), theta(4,i-1), thetad(1,i-1), thetad(2,i-1), thetad(3,i-1), thetad(4,i-1));
+        G=Gravity(theta(1,i-1), theta(2,i-1), theta(3,i-1), theta(4,i-1));
         if theta(1,i)>0
             Tcoul1=Joint_1.Friction_Torque_max;
         else
@@ -64,17 +66,18 @@ for i=1:length(t)
         else
             Tcoul4=Joint_4.Friction_Torque_min;
         end
-        F=Friction(theta(1,i), theta(2,i), theta(3,i), theta(4,i), Tcoul1, Tcoul2, Tcoul3, Tcoul4);
+        F=Friction(theta(1,i-1), theta(2,i-1), theta(3,i-1), theta(4,i-1), Tcoul1, Tcoul2, Tcoul3, Tcoul4);
         alfa=M;
         beta=V+G+F;
-        Edot=qdDes(:,i)-theta(:,i);
+        Edot(:,i)=qdDes(:,i)-theta(:,i);
         E(:,i)=qDes(:,i)-theta(:,i);
-        tauP=qddDes(:,i)+Kv*Edot+Kp*E(:,i);
-        tau(:,i)=alfa*tauP+beta;
+        tauP(:,i)=qddDes(:,i)+Kv*Edot(:,i)+Kp*E(:,i);
+        tau(:,i)=alfa*tauP(:,i)+beta;
         thetadd(:,i)=M\(tau(:,i)-V-G-F);
         thetad(:,i)=thetad(:,i-1)+thetadd(:,i)*dt;
-        theta(:,i)=theta(:,i-1)+thetad(:,i)*dt+(1/2)*thetadd(:,i)*dt^2;
+        theta(:,i)=theta(:,i-1)+thetad(:,i)*dt+(0.5)*thetadd(:,i)*dt^2;
     end
+
 end
 
 tauMotor=[tau(1,:)/Joint_1.Gear_Ratio; tau(2,:)/Joint_2.Gear_Ratio;...
