@@ -102,7 +102,7 @@ Qstowage=[pi/2 -pi/2 -pi/2 -pi/6];
 Qnavigation=[pi/2 -3*pi/20 -pi/6 -pi/6];
 Qretrieval=[-pi/2 -pi/2 pi/4 -pi/2];
 Qtransfer=[-pi/15 -pi/9 -5*pi/18 -pi/2]; 
-ft=100; % path update rate [Hz] (1/timestep)
+ft=50; % path update rate [Hz] (1/timestep)
 thetaddMax(1,1)=Joint_1.Tau_m_max/(Joint_1.Gear_Ratio*Joint_1.Motor_Inertia); % [rad/s^2] accMax joint 1
 thetaddMax(1,2)=Joint_2.Tau_m_max/(Joint_2.Gear_Ratio*Joint_2.Motor_Inertia); % [rad/s^2] accMax joint 4
 thetaddMax(1,3)=Joint_3.Tau_m_max/(Joint_3.Gear_Ratio*Joint_3.Motor_Inertia); % [rad/s^2] accMax joint 4
@@ -247,24 +247,38 @@ end
 boringButton = uicontrol('Style', 'pushbutton', 'String', 'Boring Button', 'Position', [140 20 100 20]);
 set(boringButton, 'Callback', {@strobEffectCallback, lgt});
 
-% Create a Panel to Group Sliders and Labels
-panelPosition = [0.65 0.01 0.34 0.36];  % [left bottom width height]
-sliderPanel = uipanel('Title', 'Joint Controls', ...
-             'FontSize', 10, ...
-             'FontWeight', 'bold', ...
-             'BackgroundColor', 'white', ...
-             'Position', panelPosition, ...   % Position of the panel within the figure
-             'Parent', gcf);                  % Set the parent to the current figure
+%% trajectory display
+%stowage to navigation
+sto2navButton = uicontrol('Style', 'pushbutton', 'String', 'Sto2Nav', 'Position', [250 20 100 20]);
+set(sto2navButton, 'Callback',  {@(src,event) updatePlot([], [], TableMDHsym, X_Tsym, T_B2S, T_T2W, joints, links, scoop, mframes, jframes, options, UpperArm, ForeArm, scoopLength, tSto2Nav, qSto2Nav, ft)});
 
-% Define Slider and Label Positions Relative to the Panel
-sliderPositions = [80 10 100 20; 80 40 100 20; 80 70 100 20; 80 100 100 20];
-labelPositions = [10 5 50 20; 10 35 50 20; 10 65 50 20; 10 95 50 20];
+%stowage to retrieval
+sto2retrButton = uicontrol('Style', 'pushbutton', 'String', 'Sto2Retr', 'Position', [360 20 100 20]);
+set(sto2retrButton, 'Callback',  {@(src,event) updatePlot([], [], TableMDHsym, X_Tsym, T_B2S, T_T2W, joints, links, scoop, mframes, jframes, options, UpperArm, ForeArm, scoopLength, tSto2Ret, qSto2Ret, ft)});
 
-% Create the Sliders
-slider_q1 = create_slider('q1', -160, 100, @(src, event) updatePlot(src, event, TableMDHsym, X_Tsym, T_B2S, T_T2W, joints, links, scoop, mframes, jframes, options, UpperArm, ForeArm, scoopLength), sliderPositions(1, :), labelPositions(1, :), sliderPanel);
-slider_q2 = create_slider('q2', -90, 90, @(src, event) updatePlot(src, event, TableMDHsym, X_Tsym, T_B2S, T_T2W, joints, links, scoop, mframes, jframes, options, UpperArm, ForeArm, scoopLength), sliderPositions(2, :), labelPositions(2, :), sliderPanel);
-slider_q3 = create_slider('q3', -150, 110, @(src, event) updatePlot(src, event, TableMDHsym, X_Tsym, T_B2S, T_T2W, joints, links, scoop, mframes, jframes, options, UpperArm, ForeArm, scoopLength), sliderPositions(3, :), labelPositions(3, :), sliderPanel);
-slider_q4 = create_slider('q4', -90, 5, @(src, event) updatePlot(src, event, TableMDHsym, X_Tsym, T_B2S, T_T2W, joints, links, scoop, mframes, jframes, options, UpperArm, ForeArm, scoopLength), sliderPositions(4, :), labelPositions(4, :), sliderPanel);
+%retrieval to transfer
+ret2transButton = uicontrol('Style', 'pushbutton', 'String', 'Retr2Transf', 'Position', [470 20 100 20]);
+set(ret2transButton, 'Callback',  {@(src,event) updatePlot([], [], TableMDHsym, X_Tsym, T_B2S, T_T2W, joints, links, scoop, mframes, jframes, options, UpperArm, ForeArm, scoopLength, tRet2Trans, qRet2Trans, ft)});
+
+
+% % Create a Panel to Group Sliders and Labels
+% panelPosition = [0.65 0.01 0.34 0.36];  % [left bottom width height]
+% sliderPanel = uipanel('Title', 'Joint Controls', ...
+%              'FontSize', 10, ...
+%              'FontWeight', 'bold', ...
+%              'BackgroundColor', 'white', ...
+%              'Position', panelPosition, ...   % Position of the panel within the figure
+%              'Parent', gcf);                  % Set the parent to the current figure
+% 
+% % Define Slider and Label Positions Relative to the Panel
+% sliderPositions = [80 10 100 20; 80 40 100 20; 80 70 100 20; 80 100 100 20];
+% labelPositions = [10 5 50 20; 10 35 50 20; 10 65 50 20; 10 95 50 20];
+% 
+% % Create the Sliders
+% slider_q1 = create_slider('q1', -160, 100, @(src, event) updatePlot(src, event, TableMDHsym, X_Tsym, T_B2S, T_T2W, joints, links, scoop, mframes, jframes, options, UpperArm, ForeArm, scoopLength), sliderPositions(1, :), labelPositions(1, :), sliderPanel);
+% slider_q2 = create_slider('q2', -90, 90, @(src, event) updatePlot(src, event, TableMDHsym, X_Tsym, T_B2S, T_T2W, joints, links, scoop, mframes, jframes, options, UpperArm, ForeArm, scoopLength), sliderPositions(2, :), labelPositions(2, :), sliderPanel);
+% slider_q3 = create_slider('q3', -150, 110, @(src, event) updatePlot(src, event, TableMDHsym, X_Tsym, T_B2S, T_T2W, joints, links, scoop, mframes, jframes, options, UpperArm, ForeArm, scoopLength), sliderPositions(3, :), labelPositions(3, :), sliderPanel);
+% slider_q4 = create_slider('q4', -90, 5, @(src, event) updatePlot(src, event, TableMDHsym, X_Tsym, T_B2S, T_T2W, joints, links, scoop, mframes, jframes, options, UpperArm, ForeArm, scoopLength), sliderPositions(4, :), labelPositions(4, :), sliderPanel);
 
 
 runtime = toc;
