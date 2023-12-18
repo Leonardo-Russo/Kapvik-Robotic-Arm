@@ -171,7 +171,7 @@ end
 F0=Friction(0, 0, 0, 0, Tcoul1, Tcoul2, Tcoul3, Tcoul4);
 
 % Settling time
-ts=1e15;
+ts=1;
 
 % Gain
 kv=-2*log(0.05)/ts;

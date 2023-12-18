@@ -32,20 +32,29 @@ tauP=zeros(4,length(t));
 
 %% Integrazione (metodo di Eulero)
 for i=1:length(t)
+
     if i==1
-        alfa=M0;
-        beta=V0+G0+F0;
-        Edot(:,1)=qdDes(:,1)-thetad(:,1);
-        E(:,1)=qDes(:,1)-theta(:,1);
-        tauP(:,1)=qddDes(:,1)+Kv*Edot(:,1)+Kp*E(:,1);
-        tau(:,1)=alfa*tauP(:,1)+beta;
-        thetadd(:,1)=M0\(tau(:,1)-V0-G0-F0);
+
         thetad(:,1)=thetad0;
         theta(:,1)=theta0;
+
+        alfa=M0;
+        beta=V0+G0+F0;
+
+        Edot(:,1)=qdDes(:,1)-thetad(:,1);
+        E(:,1)=qDes(:,1)-theta(:,1);
+
+        tauP(:,1)=qddDes(:,1)+Kv*Edot(:,1)+Kp*E(:,1);
+        tau(:,1)=alfa*tauP(:,1)+beta;
+
+        thetadd(:,1)=M0\(tau(:,1)-V0-G0-F0);
+        
     else
+
         M=MassMatrix(theta(1,i-1), theta(2,i-1), theta(3,i-1), theta(4,i-1));
         V=Coriolis(theta(1,i-1), theta(2,i-1), theta(3,i-1), theta(4,i-1), thetad(1,i-1), thetad(2,i-1), thetad(3,i-1), thetad(4,i-1));
         G=Gravity(theta(1,i-1), theta(2,i-1), theta(3,i-1), theta(4,i-1));
+        
         if theta(1,i)>0
             Tcoul1=Joint_1.Friction_Torque_max;
         else
@@ -66,16 +75,17 @@ for i=1:length(t)
         else
             Tcoul4=Joint_4.Friction_Torque_min;
         end
+        
         F=Friction(theta(1,i-1), theta(2,i-1), theta(3,i-1), theta(4,i-1), Tcoul1, Tcoul2, Tcoul3, Tcoul4);
         alfa=M;
         beta=V+G+F;
-        Edot(:,i)=qdDes(:,i)-theta(:,i);
-        E(:,i)=qDes(:,i)-theta(:,i);
+        Edot(:,i)=qdDes(:,i-1)-theta(:,i-1);
+        E(:,i)=qDes(:,i-1)-theta(:,i-1);
         tauP(:,i)=qddDes(:,i)+Kv*Edot(:,i)+Kp*E(:,i);
         tau(:,i)=alfa*tauP(:,i)+beta;
         thetadd(:,i)=M\(tau(:,i)-V-G-F);
-        thetad(:,i)=thetad(:,i-1)+thetadd(:,i)*dt;
-        theta(:,i)=theta(:,i-1)+thetad(:,i)*dt+(0.5)*thetadd(:,i)*dt^2;
+        thetad(:,i)=thetad(:,i-1)+thetadd(:,i-1)*dt;
+        theta(:,i)=theta(:,i-1)+thetad(:,i-1)*dt+(0.5)*thetadd(:,i-1)*dt^2;
     end
 
 end
