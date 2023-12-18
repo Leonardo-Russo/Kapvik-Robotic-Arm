@@ -5,7 +5,7 @@ clc
 %% Robot
 a2=0.46;
 a3=0.44;
-d=0.04*1.5;
+d=-0.04*1.5;
 theta1=0; %[rad]
 theta2=0; %[rad]
 theta3=0; %[rad]

@@ -95,7 +95,7 @@ X_Tsym = simplify(trans2pose(T_T2Ssym));
 
 %% Dynamical equations (symbolic expression)
 
-[M, V, G, F] = dinEqs(Joint_1, Joint_2, Joint_3, Joint_4, UpperArm, ForeArm, scoopLength, Mscoop, Iscoop);
+[M, V, G, F] = dinEqs(Joint_1, Joint_2, Joint_3, Joint_4, UpperArm, ForeArm, P_T, Mscoop, Iscoop, d3);
 
 %% Trajectory generation
 Qstowage=[pi/2 -pi/2 -pi/2 -pi/6];
@@ -144,31 +144,6 @@ qfRet2Trans=Qtransfer';
 % showTrajRet2Trans(tRet2Trans, qRet2Trans, qdRet2Trans, qddRet2Trans, omegaMax1, omegaMax2, omegaMax3, omegaMax4)
 
 %% Control Stowage to Navigation
-% C.I
-M0=MassMatrix(Qstowage(1), Qstowage(2), Qstowage(3), Qstowage(4));
-V0=Coriolis(Qstowage(1), Qstowage(2), Qstowage(3), Qstowage(4), 0, 0, 0, 0);
-G0=Gravity(Qstowage(1), Qstowage(2), Qstowage(3), Qstowage(4));
-if Qstowage(1)>0
-    Tcoul1=Joint_1.Friction_Torque_max;
-else
-    Tcoul1=Joint_1.Friction_Torque_min;
-end
-if Qstowage(2)>0
-    Tcoul2=Joint_2.Friction_Torque_max;
-else
-    Tcoul2=Joint_2.Friction_Torque_min;
-end
-if Qstowage(3)>0
-    Tcoul3=Joint_3.Friction_Torque_max;
-else
-    Tcoul3=Joint_3.Friction_Torque_min;
-end
-if Qstowage(4)>0
-    Tcoul4=Joint_4.Friction_Torque_max;
-else
-    Tcoul4=Joint_4.Friction_Torque_min;
-end
-F0=Friction(0, 0, 0, 0, Tcoul1, Tcoul2, Tcoul3, Tcoul4);
 
 % % Settling time
 % ts=0.01;
@@ -176,17 +151,21 @@ F0=Friction(0, 0, 0, 0, Tcoul1, Tcoul2, Tcoul3, Tcoul4);
 % % Gain
 % kv=-2*log(0.05)/ts;
 % kp=(kv/2)^2;
-kv=15;
-kp=(kv/2)^2;
-Kv=kv*eye(4);
-Kp=kp*eye(4);
+% kp=10;
+% kv=2*sqrt(kp);
+% Kv=kv*eye(4);
+% Kp=kp*eye(4);
+
+kp=[0 2 4 0];
+Kp=diag(kp);
+kv=[0 6 7 0];
+Kv=diag(kv);
 
 % Integration
 fc=1000;
 [tcSto2Nav, thetaSto2Nav, thetadSto2Nav, thetaddSto2Nav, qDesSto2Nav, qdDesSto2Nav,...
     qddDesSto2Nav, ESto2Nav, tauSto2Nav, tauMotorSto2Nav, iMotor] = control(TSto2Nav, Qstowage', [0 0 0 0]', ...
-                                      M0, V0, G0, F0, fc, ft, qSto2Nav, qdSto2Nav,...
-                                      qddSto2Nav,Joint_1, Joint_2, Joint_3, Joint_4, Kv, Kp);
+                             fc, ft, qSto2Nav, qdSto2Nav,qddSto2Nav,Joint_1, Joint_2, Joint_3, Joint_4, Kv, Kp);
 
 % Plot
 showControlSto2Nav(tcSto2Nav, thetaSto2Nav, thetadSto2Nav, thetaddSto2Nav, qDesSto2Nav,qdDesSto2Nav,...

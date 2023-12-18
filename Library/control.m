@@ -1,7 +1,6 @@
 function [t, theta, thetad, thetadd, qDes, qdDes , qddDes, E, tau, tauMotor, iMotor] =...
-           control(T, theta0, thetad0, M0, V0, G0, F0, fc, ft,...
+           control(T, theta0, thetad0, fc, ft,...
            qSto2Nav, qdSto2Nav, qddSto2Nav, Joint_1, Joint_2, Joint_3, Joint_4, Kv, Kp)
-
 %% Motor costant (the same for each joint)
 km=Joint_1.Tau_m_max/Joint_1.i_tau_m_max;
 
@@ -30,6 +29,32 @@ E=zeros(4,length(t));
 Edot=zeros(4,length(t));
 tauP=zeros(4,length(t));
 
+%% Initial Conditions
+M0=MassMatrix(Qstowage(1), Qstowage(2), Qstowage(3), Qstowage(4));
+V0=Coriolis(Qstowage(1), Qstowage(2), Qstowage(3), Qstowage(4), 0, 0, 0, 0);
+G0=Gravity(Qstowage(1), Qstowage(2), Qstowage(3), Qstowage(4));
+if Qstowage(1)>0
+    Tcoul1=Joint_1.Friction_Torque_max;
+else
+    Tcoul1=Joint_1.Friction_Torque_min;
+end
+if Qstowage(2)>0
+    Tcoul2=Joint_2.Friction_Torque_max;
+else
+    Tcoul2=Joint_2.Friction_Torque_min;
+end
+if Qstowage(3)>0
+    Tcoul3=Joint_3.Friction_Torque_max;
+else
+    Tcoul3=Joint_3.Friction_Torque_min;
+end
+if Qstowage(4)>0
+    Tcoul4=Joint_4.Friction_Torque_max;
+else
+    Tcoul4=Joint_4.Friction_Torque_min;
+end
+F0=Friction(0, 0, 0, 0, Tcoul1, Tcoul2, Tcoul3, Tcoul4);
+
 %% Integrazione (metodo di Eulero)
 for i=1:length(t)
 
@@ -52,7 +77,7 @@ for i=1:length(t)
     else
 
         thetad(:,i)=thetad(:,i-1)+thetadd(:,i-1)*dt;
-        theta(:,i)=theta(:,i-1)+thetad(:,i-1)*dt+(0.5)*thetadd(:,i-1)*dt^2;
+        theta(:,i)=theta(:,i-1)+thetad(:,i-1)*dt;
 
         M=MassMatrix(theta(1,i), theta(2,i), theta(3,i), theta(4,i));
         V=Coriolis(theta(1,i), theta(2,i), theta(3,i), theta(4,i), thetad(1,i), thetad(2,i), thetad(3,i), thetad(4,i));
@@ -79,7 +104,7 @@ for i=1:length(t)
             Tcoul4=Joint_4.Friction_Torque_min;
         end
         
-        F=Friction(theta(1,i), theta(2,i), theta(3,i), theta(4,i), Tcoul1, Tcoul2, Tcoul3, Tcoul4);
+        F=Friction(thetad(1,i), thetad(2,i), thetad(3,i), thetad(4,i), Tcoul1, Tcoul2, Tcoul3, Tcoul4);
         alfa=M;
         beta=V+G+F;
         Edot(:,i)=qdDes(:,i)-theta(:,i);
