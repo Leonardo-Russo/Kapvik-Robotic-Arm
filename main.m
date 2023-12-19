@@ -145,9 +145,9 @@ qfRet2Trans=Qtransfer';
 
 %% Control Stowage to Navigation
 
-kp=[0 10 3 0];
+kp=[50 50 50 50];
 Kp=diag(kp);
-kv=[0 0.06 0.05 0];
+kv=2*sqrt(kp);
 Kv=diag(kv);
 
 % Integration
