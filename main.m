@@ -145,27 +145,16 @@ qfRet2Trans=Qtransfer';
 
 %% Control Stowage to Navigation
 
-% % Settling time
-% ts=0.01;
-% 
-% % Gain
-% kv=-2*log(0.05)/ts;
-% kp=(kv/2)^2;
-% kp=10;
-% kv=2*sqrt(kp);
-% Kv=kv*eye(4);
-% Kp=kp*eye(4);
-
-kp=[0 2 4 0];
+kp=[0 10 3 0];
 Kp=diag(kp);
-kv=[0 6 7 0];
+kv=[0 0.06 0.05 0];
 Kv=diag(kv);
 
 % Integration
 fc=1000;
 [tcSto2Nav, thetaSto2Nav, thetadSto2Nav, thetaddSto2Nav, qDesSto2Nav, qdDesSto2Nav,...
     qddDesSto2Nav, ESto2Nav, tauSto2Nav, tauMotorSto2Nav, iMotor] = control(TSto2Nav, Qstowage', [0 0 0 0]', ...
-                             fc, ft, qSto2Nav, qdSto2Nav,qddSto2Nav,Joint_1, Joint_2, Joint_3, Joint_4, Kv, Kp);
+                             fc, ft, qSto2Nav, qdSto2Nav,qddSto2Nav,Joint_1, Joint_2, Joint_3, Joint_4, Kv, Kp, sigma);
 
 % Plot
 showControlSto2Nav(tcSto2Nav, thetaSto2Nav, thetadSto2Nav, thetaddSto2Nav, qDesSto2Nav,qdDesSto2Nav,...
