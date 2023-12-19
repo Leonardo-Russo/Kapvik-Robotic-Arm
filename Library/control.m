@@ -61,7 +61,7 @@ for i=1:length(t)
     if i==1
 
         thetad(:,1)=thetad0;
-        theta(:,1)=theta0+sigma*randn(4,1);
+        theta(:,1)=theta0;
 
         alfa=M0;
         beta=V0+G0+F0;
@@ -72,12 +72,25 @@ for i=1:length(t)
         tauP(:,1)=qddDes(:,1)+Kv*Edot(:,1)+Kp*E(:,1);
         tau(:,1)=alfa*tauP(:,1)+beta;
 
+        if abs(tau(1,1))>Joint_1.Tau_m_max*Joint_1.Gear_Ratio
+            tau(1,1)=sign(tau(1,1))*Joint_1.Tau_m_max*Joint_1.Gear_Ratio;
+        end
+        if abs(tau(2,1))>Joint_2.Tau_m_max*Joint_2.Gear_Ratio
+            tau(2,1)=sign(tau(2,1))*Joint_2.Tau_m_max*Joint_2.Gear_Ratio;
+        end
+        if abs(tau(3,1))>Joint_3.Tau_m_max*Joint_3.Gear_Ratio
+            tau(3,1)=sign(tau(3,1))*Joint_3.Tau_m_max*Joint_3.Gear_Ratio;
+        end
+        if abs(tau(4,1))>Joint_4.Tau_m_max*Joint_4.Gear_Ratio
+            tau(4,1)=sign(tau(4,1))*Joint_4.Tau_m_max*Joint_4.Gear_Ratio;
+        end
+
         thetadd(:,1)=M0\(tau(:,1)-V0-G0-F0);
         
     else
 
         thetad(:,i)=thetad(:,i-1)+thetadd(:,i-1)*dt;
-        theta(:,i)=theta(:,i-1)+thetad(:,i-1)*dt+sigma*randn(4,1);
+        theta(:,i)=theta(:,i-1)+thetad(:,i-1)*dt;
 
         M=MassMatrix(theta(1,i), theta(2,i), theta(3,i), theta(4,i));
         V=Coriolis(theta(1,i), theta(2,i), theta(3,i), theta(4,i), thetad(1,i), thetad(2,i), thetad(3,i), thetad(4,i));
@@ -107,10 +120,24 @@ for i=1:length(t)
         F=Friction(thetad(1,i), thetad(2,i), thetad(3,i), thetad(4,i), Tcoul1, Tcoul2, Tcoul3, Tcoul4);
         alfa=M;
         beta=V+G+F;
-        Edot(:,i)=qdDes(:,i)-theta(:,i);
+        Edot(:,i)=qdDes(:,i)-thetad(:,i);
         E(:,i)=qDes(:,i)-theta(:,i);
         tauP(:,i)=qddDes(:,i)+Kv*Edot(:,i)+Kp*E(:,i);
         tau(:,i)=alfa*tauP(:,i)+beta;
+
+        if abs(tau(1,i))>Joint_1.Tau_m_max*Joint_1.Gear_Ratio
+            tau(1,i)=sign(tau(1,i))*Joint_1.Tau_m_max*Joint_1.Gear_Ratio;
+        end
+        if abs(tau(2,i))>Joint_2.Tau_m_max*Joint_2.Gear_Ratio
+            tau(2,i)=sign(tau(2,i))*Joint_2.Tau_m_max*Joint_2.Gear_Ratio;
+        end
+        if abs(tau(3,i))>Joint_3.Tau_m_max*Joint_3.Gear_Ratio
+            tau(3,i)=sign(tau(3,i))*Joint_3.Tau_m_max*Joint_3.Gear_Ratio;
+        end
+        if abs(tau(4,i))>Joint_4.Tau_m_max*Joint_4.Gear_Ratio
+            tau(4,i)=sign(tau(4,i))*Joint_4.Tau_m_max*Joint_4.Gear_Ratio;
+        end
+
         thetadd(:,i)=M\(tau(:,i)-V-G-F);
         
     end
