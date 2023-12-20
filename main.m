@@ -108,7 +108,7 @@ thetaddMax(1,2)=Joint_2.Tau_m_max/(Joint_2.Gear_Ratio*Joint_2.Motor_Inertia); % 
 thetaddMax(1,3)=Joint_3.Tau_m_max/(Joint_3.Gear_Ratio*Joint_3.Motor_Inertia); % [rad/s^2] accMax joint 4
 thetaddMax(1,4)=Joint_4.Tau_m_max/(Joint_4.Gear_Ratio*Joint_4.Motor_Inertia); % [rad/s^2] accMax joint 4
 
-%% Stowage to Navigation
+%% Trajectory Stowage to Navigation
 TSto2Nav=25; % [s] total time from Stowage to Navigation
 q0Sto2Nav=Qstowage';
 qSto2NavInter1=[pi/2 0 -pi/2 -pi/6]';
@@ -116,10 +116,10 @@ qSto2NavInter2=[pi/2 deg2rad(-15) deg2rad(-75) -pi/6]';
 qfSto2Nav=Qnavigation';
 [tSto2Nav, qSto2Nav, qdSto2Nav, qddSto2Nav] = trajectoryGenerationSto2Nav...
                                  (q0Sto2Nav, qSto2NavInter1, qSto2NavInter2, qfSto2Nav, thetaddMax, TSto2Nav, ft);
-% % Plot
-% showTrajSto2Nav(tSto2Nav, qSto2Nav, qdSto2Nav, qddSto2Nav, omegaMax1, omegaMax2, omegaMax3, omegaMax4)
+% Plot
+showTrajSto2Nav(tSto2Nav, qSto2Nav, qdSto2Nav, qddSto2Nav, omegaMax1, omegaMax2, omegaMax3, omegaMax4)
 
-%% Stowage to Retrieval
+%% Trajectory Stowage to Retrieval
 TSto2Ret=45; % [s] total time from Stowage to Retrieval
 q0Sto2Ret=Qstowage';
 qSto2RetInter1=[-pi/2 deg2rad(-5) -pi/2 -pi/2]';
@@ -128,10 +128,10 @@ qfSto2Ret=Qretrieval';
 [tSto2Ret, qSto2Ret, qdSto2Ret, qddSto2Ret] = trajectoryGenerationSto2Ret...
                                  (q0Sto2Ret, qSto2RetInter1, qSto2RetInter2, qfSto2Ret, thetaddMax, TSto2Ret, ft);
 
-% % Plot 
-% showTrajSto2Ret(tSto2Ret, qSto2Ret, qdSto2Ret, qddSto2Ret, omegaMax1, omegaMax2, omegaMax3, omegaMax4)
+% Plot 
+showTrajSto2Ret(tSto2Ret, qSto2Ret, qdSto2Ret, qddSto2Ret, omegaMax1, omegaMax2, omegaMax3, omegaMax4)
 
-%% Retrieval to Transfer
+%% Trajectory Retrieval to Transfer
 TRet2Trans=40; % [s] total time from Retrieval to Transfer
 q0Ret2Trans=Qretrieval';
 qRet2TransInter1=[Qretrieval(1:3) deg2rad(5)]';
@@ -140,26 +140,57 @@ qfRet2Trans=Qtransfer';
 [tRet2Trans, qRet2Trans, qdRet2Trans, qddRet2Trans] = trajectoryGenerationRet2Trans...
                                                 (q0Ret2Trans, qRet2TransInter1, qRet2TransInter2, qfRet2Trans, thetaddMax, TRet2Trans, ft);
 
-% % Plot 
-% showTrajRet2Trans(tRet2Trans, qRet2Trans, qdRet2Trans, qddRet2Trans, omegaMax1, omegaMax2, omegaMax3, omegaMax4)
+% Plot 
+showTrajRet2Trans(tRet2Trans, qRet2Trans, qdRet2Trans, qddRet2Trans, omegaMax1, omegaMax2, omegaMax3, omegaMax4)
+
+%% Control frequency 
+fc=1000; % [Hz]
 
 %% Control Stowage to Navigation
-
-kp=[50 50 50 50];
-Kp=diag(kp);
-kv=2*sqrt(kp);
-Kv=diag(kv);
+kpSto2Nav=[1000 1000 1000 1000];
+KpSto2Nav=diag(kpSto2Nav);
+kvSto2Nav=2*sqrt(kpSto2Nav);
+KvSto2Nav=diag(kvSto2Nav);
 
 % Integration
-fc=1000;
 [tcSto2Nav, thetaSto2Nav, thetadSto2Nav, thetaddSto2Nav, qDesSto2Nav, qdDesSto2Nav,...
-    qddDesSto2Nav, ESto2Nav, tauSto2Nav, tauMotorSto2Nav, iMotor] = control(TSto2Nav, Qstowage', [0 0 0 0]', ...
-                             fc, ft, qSto2Nav, qdSto2Nav,qddSto2Nav,Joint_1, Joint_2, Joint_3, Joint_4, Kv, Kp, sigma);
+    qddDesSto2Nav, ESto2Nav, tauSto2Nav, tauMotorSto2Nav, iMotorSto2Nav] = control(TSto2Nav, Qstowage', [0 0 0 0]', ...
+           fc, ft, qSto2Nav, qdSto2Nav, qddSto2Nav, Joint_1, Joint_2, Joint_3, Joint_4, KvSto2Nav, KpSto2Nav, sigma);
 
 % Plot
-showControlSto2Nav(tcSto2Nav, thetaSto2Nav, thetadSto2Nav, thetaddSto2Nav, qDesSto2Nav,qdDesSto2Nav,...
-    qddDesSto2Nav, ESto2Nav, tauSto2Nav, tauMotorSto2Nav, iMotor, Joint_1.Tau_m_max, Joint_1.i_tau_m_max)
-return
+showControl(tcSto2Nav, thetaSto2Nav, thetadSto2Nav, thetaddSto2Nav, qDesSto2Nav, qdDesSto2Nav,...
+    qddDesSto2Nav, ESto2Nav, tauSto2Nav, tauMotorSto2Nav, iMotorSto2Nav,...
+    "Sto2Nav", Joint_1.Tau_m_max, Joint_1.i_tau_m_max)
+
+%% Control Stowage to Retrieval
+kpSto2Ret=[1000 1000 1000 1000];
+KpSto2Ret=diag(kpSto2Ret);
+kvSto2Ret=2*sqrt(kpSto2Ret);
+KvSto2Ret=diag(kvSto2Ret);
+
+% Integration
+[tcSto2Ret, thetaSto2Ret, thetadSto2Ret, thetaddSto2Ret, qDesSto2Ret, qdDesSto2Ret,...
+    qddDesSto2Ret, ESto2Ret, tauSto2Ret, tauMotorSto2Ret, iMotorSto2Ret] = control(TSto2Ret, Qstowage', [0 0 0 0]', ...
+        fc, ft, qSto2Ret, qdSto2Ret, qddSto2Ret, Joint_1, Joint_2, Joint_3, Joint_4, KvSto2Ret, KpSto2Ret, sigma);
+
+% Plot
+showControl(tcSto2Ret, thetaSto2Ret, thetadSto2Ret, thetaddSto2Ret, qDesSto2Ret, qdDesSto2Ret,...
+    qddDesSto2Ret, ESto2Ret, tauSto2Ret, tauMotorSto2Ret, iMotorSto2Ret, "Sto2Ret", Joint_1.Tau_m_max, Joint_1.i_tau_m_max)
+
+%% Control Retrieval to Transfer
+kpRet2Trans=[1000 1000 1000 1000];
+KpRet2Trans=diag(kpRet2Trans);
+kvRet2Trans=2*sqrt(kpRet2Trans);
+KvRet2Trans=diag(kvRet2Trans);
+
+% Integration
+[tcRet2Trans, thetaRet2Trans, thetadRet2Trans, thetaddRet2Trans, qDesRet2Trans, qdDesRet2Trans,...
+    qddDesRet2Trans, ERet2Trans, tauRet2Trans, tauMotorRet2Trans, iMotorRet2Trans] = control(TRet2Trans, Qretrieval', [0 0 0 0]', ...
+        fc, ft, qRet2Trans, qdRet2Trans, qddRet2Trans, Joint_1, Joint_2, Joint_3, Joint_4, KvRet2Trans, KpRet2Trans, sigma);
+
+% Plot
+showControl(tcRet2Trans, thetaRet2Trans, thetadRet2Trans, thetaddRet2Trans, qDesRet2Trans, qdDesRet2Trans,...
+    qddDesRet2Trans, ERet2Trans, tauRet2Trans, tauMotorRet2Trans, iMotorRet2Trans, "Ret2Trans", Joint_1.Tau_m_max, Joint_1.i_tau_m_max)
 
 %% Manipulator Visualization
 
@@ -255,7 +286,6 @@ runtime = toc;
 
 fprintf('The program took %.2f seconds to run.\n', runtime)
 
-
 return
 
 %% Test Analytic InvKine
@@ -271,7 +301,5 @@ fprintf('\nThe desired pose was:\n [%.4f \t%.4f \t%.4f \t%.4f \t%.4f \t%.4f]\n',
 fprintf('\nThe obtained pose is:\n [%.4f \t%.4f \t%.4f \t%.4f \t%.4f \t%.4f]\n', Xtest)
 fprintf('\nThe desired joint variables were:\n [%.4f \t%.4f \t%.4f \t%.4f]\n', Qtest)
 fprintf('\nThe joint variables are:\n [%.4f \t%.4f \t%.4f \t%.4f]\n', Qinv)
-
-
 
 
