@@ -2,13 +2,13 @@ function showControl(tc, theta, thetad, thetadd, qDes,qdDes,...
                   qddDes, E, tau, tauMotor, iMotor, typeOfControl, tauMotorMax, iMotorMax)
 
 if typeOfControl=="Sto2Nav"
-    figure('name', 'Control Stowage to Navigation (Angles, velocities, acceleration)', 'WindowState', 'maximized')
+    figure('name', 'Control Stowage to Navigation (Angles, velocities, acceleration)')
     sgtitle('Control Stowage to Navigation (Angles, velocities, acceleration)', 'Interpreter','latex','FontSize',20,'FontWeight','bold');
 elseif typeOfControl=="Sto2Ret"
-    figure('name', 'Control Stowage to Retrieval (Angles, velocities, acceleration)', 'WindowState', 'maximized')
+    figure('name', 'Control Stowage to Retrieval (Angles, velocities, acceleration)')
     sgtitle('Control Stowage to Retrieval (Angles, velocities, acceleration)', 'Interpreter','latex','FontSize',20,'FontWeight','bold');
 elseif typeOfControl=="Ret2Trans"
-    figure('name', 'Control Retrieval to Transfer (Angles, velocities, acceleration)', 'WindowState', 'maximized')
+    figure('name', 'Control Retrieval to Transfer (Angles, velocities, acceleration)')
     sgtitle('Control Retrieval to Transfer (Angles, velocities, acceleration)', 'Interpreter','latex','FontSize',20,'FontWeight','bold');
 else
     error('Specify type of controller')
@@ -125,13 +125,13 @@ title('Joint acceleration 4','Interpreter','latex')
 set(gca,'FontSize',10)
 
 if typeOfControl=="Sto2Nav"
-    figure('name', 'Control Stowage to Navigation (Error and Control Torque load side)', 'WindowState', 'maximized')
+    figure('name', 'Control Stowage to Navigation (Error and Control Torque load side)')
     sgtitle('Control Stowage to Navigation (Error and Control Torque load side)', 'Interpreter','latex','FontSize',20,'FontWeight','bold');
 elseif typeOfControl=="Sto2Ret"
-    figure('name', 'Control Stowage to Retrieval (Error and Control Torque load side)', 'WindowState', 'maximized')
+    figure('name', 'Control Stowage to Retrieval (Error and Control Torque load side)')
     sgtitle('Control Stowage to Retrieval (Error and Control Torque load side)', 'Interpreter','latex','FontSize',20,'FontWeight','bold');
 elseif typeOfControl=="Ret2Trans"
-    figure('name', 'Control Retrieval to Transfer (Error and Control Torque load side)', 'WindowState', 'maximized')
+    figure('name', 'Control Retrieval to Transfer (Error and Control Torque load side)')
     sgtitle('Control Retrieval to Transfer (Error and Control Torque load side)', 'Interpreter','latex','FontSize',20,'FontWeight','bold');
 else
     error('Specify type of controller')
@@ -187,13 +187,13 @@ title('Control torque Joint 4 (load side)','Interpreter','latex')
 set(gca,'FontSize',10)
 
 if typeOfControl=="Sto2Nav"
-    figure('name', 'Control Stowage to Navigation (Control Torque and Control Current motor side)', 'WindowState', 'maximized')
+    figure('name', 'Control Stowage to Navigation (Control Torque and Control Current motor side)')
     sgtitle('Control Stowage to Navigation (Control Torque and Control Current motor side)', 'Interpreter','latex','FontSize',20,'FontWeight','bold');
 elseif typeOfControl=="Sto2Ret"
-    figure('name', 'Control Stowage to Retrieval (Control Torque and Control Current motor side)', 'WindowState', 'maximized')
+    figure('name', 'Control Stowage to Retrieval (Control Torque and Control Current motor side)')
     sgtitle('Control Stowage to Retrieval (Control Torque and Control Current motor side)', 'Interpreter','latex','FontSize',20,'FontWeight','bold');
 elseif typeOfControl=="Ret2Trans"
-    figure('name', 'Control Retrieval to Transfer (Control Torque and Control Current motor side)', 'WindowState', 'maximized')
+    figure('name', 'Control Retrieval to Transfer (Control Torque and Control Current motor side)')
     sgtitle('Control Retrieval to Transfer (Control Torque and Control Current motor side)', 'Interpreter','latex','FontSize',20,'FontWeight','bold');
 else
     error('Specify type of controller')

@@ -1,6 +1,6 @@
 function showTrajSto2Ret(tSto2Ret, qSto2Ret, qdSto2Ret, qddSto2Ret, omegaMax1, omegaMax2, omegaMax3, omegaMax4)
 
-figure('name', 'Stowage to Navigation', 'WindowState', 'maximized')
+figure('name', 'Stowage to Retrieval', 'WindowState', 'maximized')
 subplot(3,4,1)
 plot(tSto2Ret,rad2deg(qSto2Ret(1,:)),'r',lineWidth=1.5)
 xlabel('$$t$$ [s]','Interpreter','latex')
@@ -87,5 +87,5 @@ xlabel('$$t$$ [s]','Interpreter','latex')
 ylabel('$$\ddot\theta_4(t)$$ $$[^\circ/s^2]$$','Interpreter','latex')
 title('Joint acceleration 4','Interpreter','latex')
 set(gca,'FontSize',15)
-sgtitle('Stowage to Retrivial', 'Interpreter','latex','FontSize',20,'FontWeight','bold');
+sgtitle('Stowage to Retrievial', 'Interpreter','latex','FontSize',20,'FontWeight','bold');
 end

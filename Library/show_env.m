@@ -22,7 +22,7 @@ hd = 0.07;
 wd = 0.1;
 % Define supportBox position
 position = [-0.3, -0.05, 0.23];
-deliveryBox = plot3DBox(ld, wd, hd, [0.9, 0.9, 0.9]);
+deliveryBox = plotDeliveryBox(ld, wd, hd, [0.9, 0.9, 0.9]);
 vertices = get(deliveryBox, 'Vertices');
 set(deliveryBox, 'Vertices', bsxfun(@plus, vertices, position));
 

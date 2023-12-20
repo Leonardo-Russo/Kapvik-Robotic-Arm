@@ -1,6 +1,6 @@
 function showTrajRet2Trans(tRet2Trans, qRet2Trans, qdRet2Trans, qddRet2Trans, omegaMax1, omegaMax2, omegaMax3, omegaMax4)
 
-figure('name', 'Stowage to Navigation', 'WindowState', 'maximized')
+figure('name', 'Retrieval to Tranfer', 'WindowState', 'maximized')
 subplot(3,4,1)
 plot(tRet2Trans,rad2deg(qRet2Trans(1,:)),'r',lineWidth=1.5)
 xlabel('$$t$$ [s]','Interpreter','latex')
