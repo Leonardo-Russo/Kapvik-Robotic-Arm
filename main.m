@@ -28,10 +28,17 @@ h = 0.3;                % m
 % Define Base Shift along y
 P_By = 0.1;             % m
 
-% Define Scoop Dimension and Inertia properties
-scoopLength = 0.05;      % m
-Mscoop=1;                % kg
+% Define density of martian terrein
+rhoM=3.934*10^(3);      % kg/m^3
+
+% Define Scoop Dimension and Inertia properties (hp: scoop=sphere of radius
+%                                                          scoopLength)
+scoopLength = 0.05;     % m
+Mscoop=1;               % kg
 Iscoop=(2/3)*Mscoop*scoopLength^2;
+Vscoop=(4/3)*pi*scoopLength^3;
+MscoopFULL=Mscoop+rhoM*Vscoop;
+IscoopFULL=(2/3)*MscoopFULL*scoopLength^2;
 
 % Other Parameters
 a2 = 0.46;              % m
@@ -56,7 +63,7 @@ omegaMax3=(10300*2*pi/60)/Joint_3.Gear_Ratio; % rad/s
 omegaMax4=(10300*2*pi/60)/Joint_4.Gear_Ratio; % rad/s
 
 % Define d3
-d3 = -1.5*10^(-3)*UpperArm.Diameter;
+d3 = vpa(-1.5*10^(-3)*UpperArm.Diameter);
 
 % Define Base Frame
 R_B = R3(pi);
@@ -96,11 +103,13 @@ X_Tsym = simplify(trans2pose(T_T2Ssym));
 %% Dynamical equations (symbolic expression)
 
 [M, V, G, F] = dinEqs(Joint_1, Joint_2, Joint_3, Joint_4, UpperArm, ForeArm, P_T, Mscoop, Iscoop, d3);
+% [Mfull, Vfull, Gfull, Ffull] = dinEqs(Joint_1, Joint_2, Joint_3, Joint_4, UpperArm, ForeArm, P_T, MscoopFULL, IscoopFULL, d3);
+% [M, V, G, tauF] = dinEqsREACTION(Joint_1, Joint_2, Joint_3, Joint_4, UpperArm, ForeArm, P_T, Mscoop, Iscoop, d3);
 
 %% Trajectory generation
 Qstowage=[pi/2 -pi/2 -pi/2 -pi/6];
 Qnavigation=[pi/2 -3*pi/20 -pi/6 -pi/6];
-Qretrieval=[-pi/2 -pi/2 pi/4 -pi/2];
+Qretrieval=[-pi/2 -pi/2 pi/5 -pi/2];
 Qtransfer=[-pi/15 -pi/9 -5*pi/18 -pi/2]; 
 ft=100; % path update rate [Hz] (1/timestep)
 thetaddMax(1,1)=Joint_1.Tau_m_max/(Joint_1.Gear_Ratio*Joint_1.Motor_Inertia); % [rad/s^2] accMax joint 1
@@ -154,8 +163,8 @@ KvSto2Nav=diag(kvSto2Nav);
 
 % Integration
 [tcSto2Nav, thetaSto2Nav, thetadSto2Nav, thetaddSto2Nav, qDesSto2Nav, qdDesSto2Nav,...
-    qddDesSto2Nav, ESto2Nav, tauSto2Nav, tauMotorSto2Nav, iMotorSto2Nav] = control(TSto2Nav, Qstowage', [0 0 0 0]', ...
-           fc, ft, qSto2Nav, qdSto2Nav, qddSto2Nav, Joint_1, Joint_2, Joint_3, Joint_4, KvSto2Nav, KpSto2Nav, sigma);
+    qddDesSto2Nav, ESto2Nav, tauSto2Nav, tauMotorSto2Nav, iMotorSto2Nav] = control(TSto2Nav, Qstowage', [0 0 0 0]', [0 0 0 0]', ...
+           fc, ft, qSto2Nav, qdSto2Nav, qddSto2Nav, Joint_1, Joint_2, Joint_3, Joint_4, KvSto2Nav, KpSto2Nav, sigma, "Sto2Nav", P_T);
 
 % Plot
 showControl(tcSto2Nav, thetaSto2Nav, thetadSto2Nav, thetaddSto2Nav, qDesSto2Nav, qdDesSto2Nav,...
@@ -170,8 +179,8 @@ KvSto2Ret=diag(kvSto2Ret);
 
 % Integration
 [tcSto2Ret, thetaSto2Ret, thetadSto2Ret, thetaddSto2Ret, qDesSto2Ret, qdDesSto2Ret,...
-    qddDesSto2Ret, ESto2Ret, tauSto2Ret, tauMotorSto2Ret, iMotorSto2Ret] = control(TSto2Ret, Qstowage', [0 0 0 0]', ...
-        fc, ft, qSto2Ret, qdSto2Ret, qddSto2Ret, Joint_1, Joint_2, Joint_3, Joint_4, KvSto2Ret, KpSto2Ret, sigma);
+    qddDesSto2Ret, ESto2Ret, tauSto2Ret, tauMotorSto2Ret, iMotorSto2Ret] = control(TSto2Ret, Qstowage', [0 0 0 0]', [0 0 0 0]', ...
+        fc, ft, qSto2Ret, qdSto2Ret, qddSto2Ret, Joint_1, Joint_2, Joint_3, Joint_4, KvSto2Ret, KpSto2Ret, sigma, "Sto2Ret", P_T);
 
 % Plot
 showControl(tcSto2Ret, thetaSto2Ret, thetadSto2Ret, thetaddSto2Ret, qDesSto2Ret, qdDesSto2Ret,...
@@ -185,8 +194,8 @@ KvRet2Trans=diag(kvRet2Trans);
 
 % Integration
 [tcRet2Trans, thetaRet2Trans, thetadRet2Trans, thetaddRet2Trans, qDesRet2Trans, qdDesRet2Trans,...
-    qddDesRet2Trans, ERet2Trans, tauRet2Trans, tauMotorRet2Trans, iMotorRet2Trans] = control(TRet2Trans, Qretrieval', [0 0 0 0]', ...
-        fc, ft, qRet2Trans, qdRet2Trans, qddRet2Trans, Joint_1, Joint_2, Joint_3, Joint_4, KvRet2Trans, KpRet2Trans, sigma);
+    qddDesRet2Trans, ERet2Trans, tauRet2Trans, tauMotorRet2Trans, iMotorRet2Trans] = control(TRet2Trans, Qretrieval', thetadSto2Ret(:,end), thetaddSto2Ret(:,end), ...
+        fc, ft, qRet2Trans, qdRet2Trans, qddRet2Trans, Joint_1, Joint_2, Joint_3, Joint_4, KvRet2Trans, KpRet2Trans, sigma, "Ret2Trans", P_T);
 
 % Plot
 showControl(tcRet2Trans, thetaRet2Trans, thetadRet2Trans, thetaddRet2Trans, qDesRet2Trans, qdDesRet2Trans,...
@@ -289,17 +298,17 @@ fprintf('The program took %.2f seconds to run.\n', runtime)
 return
 
 %% Test Analytic InvKine
-
-Qtest = Q;
-X_W2B = double(subs(X_W2Bsym, [q1, q2, q3, q4], [Qtest(1), Qtest(2), Qtest(3), Qtest(4)]));
-
-[Qinv] = invkine(X_W2B, UpperArm.Length, ForeArm.Length, d3, "ElbowUp");
-
-Xtest = double(subs(X_W2Bsym, [q1, q2, q3, q4], [Qinv(1), Qinv(2), Qinv(3), Qinv(4)]));
-
-fprintf('\nThe desired pose was:\n [%.4f \t%.4f \t%.4f \t%.4f \t%.4f \t%.4f]\n', X_W2B)
-fprintf('\nThe obtained pose is:\n [%.4f \t%.4f \t%.4f \t%.4f \t%.4f \t%.4f]\n', Xtest)
-fprintf('\nThe desired joint variables were:\n [%.4f \t%.4f \t%.4f \t%.4f]\n', Qtest)
-fprintf('\nThe joint variables are:\n [%.4f \t%.4f \t%.4f \t%.4f]\n', Qinv)
+% 
+% Qtest = Q;
+% X_W2B = double(subs(X_W2Bsym, [q1, q2, q3, q4], [Qtest(1), Qtest(2), Qtest(3), Qtest(4)]));
+% 
+% [Qinv] = invkine(X_W2B, UpperArm.Length, ForeArm.Length, d3, "ElbowUp");
+% 
+% Xtest = double(subs(X_W2Bsym, [q1, q2, q3, q4], [Qinv(1), Qinv(2), Qinv(3), Qinv(4)]));
+% 
+% fprintf('\nThe desired pose was:\n [%.4f \t%.4f \t%.4f \t%.4f \t%.4f \t%.4f]\n', X_W2B)
+% fprintf('\nThe obtained pose is:\n [%.4f \t%.4f \t%.4f \t%.4f \t%.4f \t%.4f]\n', Xtest)
+% fprintf('\nThe desired joint variables were:\n [%.4f \t%.4f \t%.4f \t%.4f]\n', Qtest)
+% fprintf('\nThe joint variables are:\n [%.4f \t%.4f \t%.4f \t%.4f]\n', Qinv)
 
 
