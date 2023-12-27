@@ -1,8 +1,8 @@
-function [M, V, G, tauF] = dinEqs(Joint_1, Joint_2, Joint_3, Joint_4, UpperArm, ForeArm, P_T, Mscoop, Iscoop, d3)
+function [M, V, G, tauF] = dinEqsREACTION(Joint_1, Joint_2, Joint_3, Joint_4, UpperArm, ForeArm, P_T, Mscoop, Iscoop, d3)
 % Dynamic eqs 
 
 format long
-syms q_1 q_2 q_3 q_4 q_1d q_2d q_3d q_4d q_1dd q_2dd q_3dd q_4dd g Tc1 Tc2 Tc3 Tc4 real
+syms q_1 q_2 q_3 q_4 q_1d q_2d q_3d q_4d q_1dd q_2dd q_3dd q_4dd g Tc1 Tc2 Tc3 Tc4 f5x f5y f5z n5x n5y n5z real
 sympref('AbbreviateOutput', false);
 JOINT=[Joint_1 Joint_2 Joint_3 Joint_4];
 % Mass property of the link
@@ -31,7 +31,7 @@ P_B21=[0 0 0]'; % in the sdr B
 P_122=[0 0 0]'; % in the sdr 1
 P_223=[UpperArm.Length 0 d3]'; % in the sdr 2
 P_32W=[ForeArm.Length 0 0]'; % in the sdr 3
-P_W2Tend=[P_T(1); P_T(1)/2; 0]; % in the sdr 4 (wrist frame)
+P_W2Tend=[P_T(1); -P_T(1)/2; 0]; % in the sdr 4 (wrist frame)
 P(:,1)=P_B21;
 P(:,2)=P_122;
 P(:,3)=P_223;
@@ -75,6 +75,8 @@ end
 % Preallocation 
 f=sym(zeros(3, 5));
 n=sym(zeros(3, 5));
+f(:,5)=[f5x f5y f5z]';
+n(:,5)=[n5x n5y n5z]';
 tau=sym(zeros(5, 1));
 
 for i=5:-1:2
