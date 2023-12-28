@@ -103,10 +103,9 @@ X_Tsym = simplify(trans2pose(T_T2Ssym));
 %% Dynamical equations (symbolic expression)
 
 [M, V, G, F] = dinEqs(Joint_1, Joint_2, Joint_3, Joint_4, UpperArm, ForeArm, P_T, Mscoop, Iscoop, d3);
-% [Mfull, Vfull, Gfull, Ffull] = dinEqs(Joint_1, Joint_2, Joint_3, Joint_4, UpperArm, ForeArm, P_T, MscoopFULL, IscoopFULL, d3);
-% [M, V, G, tauF] = dinEqsREACTION(Joint_1, Joint_2, Joint_3, Joint_4, UpperArm, ForeArm, P_T, Mscoop, Iscoop, d3);
 
 %% Trajectory generation
+
 Qstowage=[pi/2 -pi/2 -pi/2 -pi/6];
 Qnavigation=[pi/2 -3*pi/20 -pi/6 -pi/6];
 Qretrieval=[-pi/2 -pi/2 pi/5 -pi/2];
@@ -118,6 +117,7 @@ thetaddMax(1,3)=Joint_3.Tau_m_max/(Joint_3.Gear_Ratio*Joint_3.Motor_Inertia); % 
 thetaddMax(1,4)=Joint_4.Tau_m_max/(Joint_4.Gear_Ratio*Joint_4.Motor_Inertia); % [rad/s^2] accMax joint 4
 
 %% Trajectory Stowage to Navigation
+
 TSto2Nav=25; % [s] total time from Stowage to Navigation
 q0Sto2Nav=Qstowage';
 qSto2NavInter1=[pi/2 0 -pi/2 -pi/6]';
@@ -129,6 +129,7 @@ qfSto2Nav=Qnavigation';
 showTrajSto2Nav(tSto2Nav, qSto2Nav, qdSto2Nav, qddSto2Nav, omegaMax1, omegaMax2, omegaMax3, omegaMax4)
 
 %% Trajectory Stowage to Retrieval
+
 TSto2Ret=45; % [s] total time from Stowage to Retrieval
 q0Sto2Ret=Qstowage';
 qSto2RetInter1=[-pi/2 deg2rad(-5) -pi/2 -pi/2]';
@@ -141,6 +142,7 @@ qfSto2Ret=Qretrieval';
 showTrajSto2Ret(tSto2Ret, qSto2Ret, qdSto2Ret, qddSto2Ret, omegaMax1, omegaMax2, omegaMax3, omegaMax4)
 
 %% Trajectory Retrieval to Transfer
+
 TRet2Trans=40; % [s] total time from Retrieval to Transfer
 q0Ret2Trans=Qretrieval';
 qRet2TransInter1=[Qretrieval(1:3) deg2rad(5)]';
@@ -156,6 +158,7 @@ showTrajRet2Trans(tRet2Trans, qRet2Trans, qdRet2Trans, qddRet2Trans, omegaMax1, 
 fc=1000; % [Hz]
 
 %% Control Stowage to Navigation
+
 kpSto2Nav=[1000 1000 1000 1000];
 KpSto2Nav=diag(kpSto2Nav);
 kvSto2Nav=2*sqrt(kpSto2Nav);
@@ -172,6 +175,7 @@ showControl(tcSto2Nav, thetaSto2Nav, thetadSto2Nav, thetaddSto2Nav, qDesSto2Nav,
     "Sto2Nav", Joint_1.Tau_m_max, Joint_1.i_tau_m_max)
 
 %% Control Stowage to Retrieval
+
 kpSto2Ret=[1000 1000 1000 1000];
 KpSto2Ret=diag(kpSto2Ret);
 kvSto2Ret=2*sqrt(kpSto2Ret);
@@ -187,6 +191,7 @@ showControl(tcSto2Ret, thetaSto2Ret, thetadSto2Ret, thetaddSto2Ret, qDesSto2Ret,
     qddDesSto2Ret, ESto2Ret, tauSto2Ret, tauMotorSto2Ret, iMotorSto2Ret, "Sto2Ret", Joint_1.Tau_m_max, Joint_1.i_tau_m_max)
 
 %% Control Retrieval to Transfer
+
 kpRet2Trans=[1000 1000 1000 1000];
 KpRet2Trans=diag(kpRet2Trans);
 kvRet2Trans=2*sqrt(kpRet2Trans);
@@ -253,56 +258,34 @@ if options.show_frames
     set(toggleButton, 'Callback', {@toggleLegendCallback, lgd});    % set the callback for the boring button
 end
 
-% Add Boring button
+% Add Buttons
 boringButton = uicontrol('Style', 'pushbutton', 'String', 'Boring Button', 'Position', [140 20 100 20]);
 set(boringButton, 'Callback', {@strobEffectCallback, lgt});
 
-%% trajectory display
-%stowage to navigation
+% Stowage to Navigation Button
 sto2navButton = uicontrol('Style', 'pushbutton', 'String', 'Sto2Nav', 'Position', [250 20 100 20]);
 set(sto2navButton, 'Callback',  {@(src,event) updatePlot(TableMDHsym, X_Tsym, T_B2S, T_T2W, joints, links, scoop, mframes, jframes, options, UpperArm, ForeArm, scoopLength, tSto2Nav, qSto2Nav, ft)});
 
-%stowage to retrieval
+% Stowage to Retrieval Button
 sto2retrButton = uicontrol('Style', 'pushbutton', 'String', 'Sto2Retr', 'Position', [360 20 100 20]);
 set(sto2retrButton, 'Callback',  {@(src,event) updatePlot(TableMDHsym, X_Tsym, T_B2S, T_T2W, joints, links, scoop, mframes, jframes, options, UpperArm, ForeArm, scoopLength, tSto2Ret, qSto2Ret, ft)});
 
-%retrieval to transfer
+% Retrieval to Transfer Button
 ret2transButton = uicontrol('Style', 'pushbutton', 'String', 'Retr2Transf', 'Position', [470 20 100 20]);
 set(ret2transButton, 'Callback',  {@(src,event) updatePlot(TableMDHsym, X_Tsym, T_B2S, T_T2W, joints, links, scoop, mframes, jframes, options, UpperArm, ForeArm, scoopLength, tRet2Trans, qRet2Trans, ft)});
 
 
-% % Create a Panel to Group Sliders and Labels
-% panelPosition = [0.65 0.01 0.34 0.36];  % [left bottom width height]
-% sliderPanel = uipanel('Title', 'Joint Controls', ...
-%              'FontSize', 10, ...
-%              'FontWeight', 'bold', ...
-%              'BackgroundColor', 'white', ...
-%              'Position', panelPosition, ...   % Position of the panel within the figure
-%              'Parent', gcf);                  % Set the parent to the current figure
-% 
-% % Define Slider and Label Positions Relative to the Panel
-% sliderPositions = [80 10 100 20; 80 40 100 20; 80 70 100 20; 80 100 100 20];
-% labelPositions = [10 5 50 20; 10 35 50 20; 10 65 50 20; 10 95 50 20];
-% 
-% % Create the Sliders
-% slider_q1 = create_slider('q1', -160, 100, @(src, event) updatePlot(src, event, TableMDHsym, X_Tsym, T_B2S, T_T2W, joints, links, scoop, mframes, jframes, options, UpperArm, ForeArm, scoopLength), sliderPositions(1, :), labelPositions(1, :), sliderPanel);
-% slider_q2 = create_slider('q2', -90, 90, @(src, event) updatePlot(src, event, TableMDHsym, X_Tsym, T_B2S, T_T2W, joints, links, scoop, mframes, jframes, options, UpperArm, ForeArm, scoopLength), sliderPositions(2, :), labelPositions(2, :), sliderPanel);
-% slider_q3 = create_slider('q3', -150, 110, @(src, event) updatePlot(src, event, TableMDHsym, X_Tsym, T_B2S, T_T2W, joints, links, scoop, mframes, jframes, options, UpperArm, ForeArm, scoopLength), sliderPositions(3, :), labelPositions(3, :), sliderPanel);
-% slider_q4 = create_slider('q4', -90, 5, @(src, event) updatePlot(src, event, TableMDHsym, X_Tsym, T_B2S, T_T2W, joints, links, scoop, mframes, jframes, options, UpperArm, ForeArm, scoopLength), sliderPositions(4, :), labelPositions(4, :), sliderPanel);
-
-
 runtime = toc;
+fprintf('The program took %.2f seconds to run.\n', runtime);
 
-fprintf('The program took %.2f seconds to run.\n', runtime)
 
-return
 
 %% Test Analytic InvKine
 % 
 % Qtest = Q;
 % X_W2B = double(subs(X_W2Bsym, [q1, q2, q3, q4], [Qtest(1), Qtest(2), Qtest(3), Qtest(4)]));
 % 
-% [Qinv] = invkine(X_W2B, UpperArm.Length, ForeArm.Length, d3, "ElbowUp");
+% [Qinv] = invkine(X_W2B, UpperArm.Length, ForeArm.Length, d3, "ElbowDown");
 % 
 % Xtest = double(subs(X_W2Bsym, [q1, q2, q3, q4], [Qinv(1), Qinv(2), Qinv(3), Qinv(4)]));
 % 
@@ -310,5 +293,5 @@ return
 % fprintf('\nThe obtained pose is:\n [%.4f \t%.4f \t%.4f \t%.4f \t%.4f \t%.4f]\n', Xtest)
 % fprintf('\nThe desired joint variables were:\n [%.4f \t%.4f \t%.4f \t%.4f]\n', Qtest)
 % fprintf('\nThe joint variables are:\n [%.4f \t%.4f \t%.4f \t%.4f]\n', Qinv)
-
+% 
 
