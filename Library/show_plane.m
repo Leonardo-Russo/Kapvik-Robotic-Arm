@@ -28,5 +28,6 @@ terrain = surf(X,Y,Z, 'FaceColor', color, 'FaceAlpha', 0.25, 'EdgeAlpha', 0.25, 
 % MarsTerrain = imread('mars.jpg');
 % %%% Plot Martian soil
 % warp(X,Y,Z,MarsTerrain);
+% set(gca, 'YDir', 'normal')
 
 end

@@ -1,4 +1,4 @@
-function [Q] = invkine(X, L1, L2, d, typeOfSol)
+function [Q] = invkine(X, L1, L2, d, ofs2, ofs3, ofs4, typeOfSol)
 % This function take as input the pose X of the wrist wrt the base in the 
 % base reference frame and the link length and gives as output the
 % corresponding joint angles that correspond to the particular solution
@@ -11,8 +11,7 @@ z=X(3);
 roll=X(4);
 pitch=X(5); % [rad]
 yaw=X(6); % [rad]
-prec=yaw; % [rad]
-[q234] = RPY2angle(roll, pitch, yaw); % sequence 3-1-3
+[q234, prec] = RPY2angle(roll, pitch, yaw); % sequence 3-1-3
 
 %% q1
 q1=prec;
@@ -48,15 +47,27 @@ end
 q2(1)=atan2(s2(1),c2(1)); % elbow up
 q2(2)=atan2(s2(2),c2(2)); % elbow down
 
+if s2(1)>=0
+    q2ElbowUp=q2(1);
+    q2ElbowDown=q2(2);
+    q3ElbowUp=q3(1);
+    q3ElbowDown=q3(2);
+elseif s2(1)<0
+    q2ElbowUp=q2(2);
+    q2ElbowDown=q2(1);
+    q3ElbowUp=q3(2);
+    q3ElbowDown=q3(1);
+end
+
 %% q4
-q4(1)=q234-q2(1)-q3(1);
-q4(2)=q234-q2(2)-q3(2);
+q4ElbowUp=q234-q2ElbowUp-q3ElbowUp;
+q4ElbowDown=q234-q2ElbowDown-q3ElbowDown;
 
 %% Solution
 if typeOfSol=="ElbowUp" 
-    Q=[q1 q2(1) q3(1) q4(1)]';
+    Q=[q1 q2ElbowUp-ofs2 q3ElbowUp-ofs3 q4ElbowUp-ofs4]';
 elseif typeOfSol=="ElbowDown"
-    Q=[q1 q2(2) q3(2) q4(2)]';
+    Q=[q1 q2ElbowDown-ofs2 q3ElbowDown-ofs3 q4ElbowDown-ofs4]';
 end
 
 if ~isreal(Q)
