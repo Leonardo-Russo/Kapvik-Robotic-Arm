@@ -11,6 +11,9 @@ ofs1 = 0;
 ofs2 = pi/2;
 ofs3 = -pi/2;
 ofs4 = pi/6;
+% ofs2 = 0;
+% ofs3 = 0;
+% ofs4 = 0;
 
 TableMDH = [0,      0,     0,     q1 + ofs1;...
             pi/2,   0,     0,     q2 + ofs2;...

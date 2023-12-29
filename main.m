@@ -274,24 +274,25 @@ set(sto2retrButton, 'Callback',  {@(src,event) updatePlot(TableMDHsym, X_Tsym, T
 ret2transButton = uicontrol('Style', 'pushbutton', 'String', 'Retr2Transf', 'Position', [470 20 100 20]);
 set(ret2transButton, 'Callback',  {@(src,event) updatePlot(TableMDHsym, X_Tsym, T_B2S, T_T2W, joints, links, scoop, mframes, jframes, options, UpperArm, ForeArm, scoopLength, tRet2Trans, qRet2Trans, ft)});
 
-
 runtime = toc;
 fprintf('The program took %.2f seconds to run.\n', runtime);
 
-
-
 %% Test Analytic InvKine
-% 
-% Qtest = Q;
-% X_W2B = double(subs(X_W2Bsym, [q1, q2, q3, q4], [Qtest(1), Qtest(2), Qtest(3), Qtest(4)]));
-% 
-% [Qinv] = invkine(X_W2B, UpperArm.Length, ForeArm.Length, d3, "ElbowDown");
-% 
-% Xtest = double(subs(X_W2Bsym, [q1, q2, q3, q4], [Qinv(1), Qinv(2), Qinv(3), Qinv(4)]));
-% 
-% fprintf('\nThe desired pose was:\n [%.4f \t%.4f \t%.4f \t%.4f \t%.4f \t%.4f]\n', X_W2B)
-% fprintf('\nThe obtained pose is:\n [%.4f \t%.4f \t%.4f \t%.4f \t%.4f \t%.4f]\n', Xtest)
-% fprintf('\nThe desired joint variables were:\n [%.4f \t%.4f \t%.4f \t%.4f]\n', Qtest)
-% fprintf('\nThe joint variables are:\n [%.4f \t%.4f \t%.4f \t%.4f]\n', Qinv)
-% 
+clc
+Qtest = Qretrieval;
+X_W2B = double(subs(X_W2Bsym, [q1, q2, q3, q4], [Qtest(1), Qtest(2), Qtest(3), Qtest(4)]));
+
+ofs2 = pi/2;
+ofs3 = -pi/2;
+ofs4 = pi/6;
+[Qinv] = invkine(X_W2B, UpperArm.Length, ForeArm.Length, d3, ofs2, ofs3, ofs4, "ElbowUp");
+
+Xtest = double(subs(X_W2Bsym, [q1, q2, q3, q4], [Qinv(1), Qinv(2), Qinv(3), Qinv(4)]));
+
+fprintf('\nThe desired pose was:\n [%.4f \t%.4f \t%.4f \t%.4f \t%.4f \t%.4f]\n', X_W2B)
+fprintf('\nThe obtained pose is:\n [%.4f \t%.4f \t%.4f \t%.4f \t%.4f \t%.4f]\n', Xtest)
+fprintf('\nThe desired joint variables were:\n [%.4f \t%.4f \t%.4f \t%.4f]\n', Qtest)
+fprintf('\nThe joint variables are:\n [%.4f \t%.4f \t%.4f \t%.4f]\n', Qinv)
+
+
 
