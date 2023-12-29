@@ -278,7 +278,7 @@ runtime = toc;
 fprintf('The program took %.2f seconds to run.\n', runtime);
 
 %% Test Analytic InvKine
-clc
+
 Qtest = Qretrieval;
 X_W2B = double(subs(X_W2Bsym, [q1, q2, q3, q4], [Qtest(1), Qtest(2), Qtest(3), Qtest(4)]));
 
