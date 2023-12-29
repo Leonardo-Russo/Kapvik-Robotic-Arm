@@ -1,7 +1,8 @@
 function updatePlot(TableMDHsym, X_Tsym, T_B2S, T_T2W, joints, links, scoop, mframes, jframes, options, Upper_Arm, Fore_Arm, scoopLength, tTrajectory, qTrajectory, ft)
 
-global Q Qsym
-%
+global Q
+
+% global Qsym
 % q1 = Qsym(1);
 % q2 = Qsym(2);
 % q3 = Qsym(3);
@@ -11,7 +12,13 @@ global Q Qsym
 % newAngle = deg2rad(get(src, 'Value'));      % get the new value from the slider
 % Q(jointIndex) = newAngle;
 
+videoFilename = 'Output/animation.mp4';
 fps = 30;       % frames per second
+
+% Set up the video writer
+writerObj = VideoWriter(videoFilename, 'MPEG-4');
+writerObj.FrameRate = fps;
+open(writerObj);
 
 % Simulation loop
 for i = 1:length(tTrajectory)
@@ -54,10 +61,17 @@ for i = 1:length(tTrajectory)
         fprintf('X_T\t=\t[%.3f \t%.3f \t%.3f \t%.3f \t%.3f \t%.3f]\n', X_T)
         % show_pseudodetJ     % show pseudo-determinant of Jacobian Matrix
 
-        % Add a pause to control the speed of the simulation
-        pause(1/fps);
+        % % Add a pause to control the speed of the simulation
+        % pause(1/fps);
+
+        % Capture the plot as a frame and write to the video file
+        frame = getframe(gcf);
+        writeVideo(writerObj, frame);
 
     end
 
 end
+
+close(writerObj);
+
 end
