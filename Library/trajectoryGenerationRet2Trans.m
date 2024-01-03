@@ -46,8 +46,8 @@ thetad23=(qinter2(1:3)-qinter1(1:3))/dt2; % first, second and third joint veloci
 
 thetad34=(qf(4)-qinter2(4))./(dt3-(t4/2)); % fourth joint velocity in the third linear reagion
 
-thetadd2=sign([thetad23; 0]-[0 0 0 thetad12]').*abs(thetadd); % first, second, third and fourth joint accelleration in the second parabolic reagion
-thetadd3=sign([0 0 0 thetad34]'-[thetad23; 0]).*abs(thetadd); % first, second, third and fourth joint accelleration in the third parabolic reagion
+thetadd2=sign([thetad23; 0]-[0 0 0 thetad12]').*abs(thetadd'); % first, second, third and fourth joint accelleration in the second parabolic reagion
+thetadd3=sign([0 0 0 thetad34]'-[thetad23; 0]).*abs(thetadd'); % first, second, third and fourth joint accelleration in the third parabolic reagion
 
 t2=([thetad23; 0]-[0 0 0 thetad12]')./thetadd2; % second blending period (of first, second, third and fourth joint)
 t3=([0 0 0 thetad34]'-[thetad23; 0])./thetadd3; % third blending period  (of first, second, third and fourth joint)

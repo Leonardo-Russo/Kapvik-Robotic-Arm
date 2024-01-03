@@ -34,7 +34,7 @@ timestep=1/ft;
 % 4-->Ending point
 
 thetadd1=sign(qinter1(2)-q0(2))*abs(thetadd(2)); % second joint accelleration in the first parabolic reagion
-thetadd4=sign(qinter2(2:3)-qf(2:3)).*abs(thetadd(2:3)); % second and third joint accelleration in the fourth and last parabolic reagion
+thetadd4=sign(qinter2(2:3)-qf(2:3)).*abs(thetadd(2:3)'); % second and third joint accelleration in the fourth and last parabolic reagion
 
 t1=dt1-sqrt((dt1^2)-((2*(qinter1(2)-q0(2))/thetadd1))); % first blending period  
 t4=dt3-sqrt((dt3^2)-((2*(qinter2(2:3)-qf(2:3))./thetadd4))); % fourth and last blending period 
@@ -43,8 +43,8 @@ thetad12=(qinter1(2)-q0(2))/(dt1-(t1/2)); % second joint velocity in the first l
 thetad23=(qinter2(2:3)-qinter1(2:3))/dt2; % second and third joint velocities in the second linear reagion
 thetad34=(qf(2:3)-qinter2(2:3))./(dt3-(t4/2)); % second and third joint velocities in the third linear reagion
 
-thetadd2=sign(thetad23-[thetad12 0]').*abs(thetadd(2:3)); % second and third joint accelleration in the second parabolic reagion
-thetadd3=sign(thetad34-thetad23).*abs(thetadd(2:3)); % second and third joint accelleration in the third parabolic reagion
+thetadd2=sign(thetad23-[thetad12 0]').*abs(thetadd(2:3)'); % second and third joint accelleration in the second parabolic reagion
+thetadd3=sign(thetad34-thetad23).*abs(thetadd(2:3)'); % second and third joint accelleration in the third parabolic reagion
 
 t2=(thetad23-[thetad12 0]')./thetadd2; % second blending period
 t3=(thetad34-thetad23)./thetadd3; % third blending period 
