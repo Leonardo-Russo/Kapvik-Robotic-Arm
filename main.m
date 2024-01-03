@@ -112,8 +112,8 @@ Qretrieval=[-pi/2 -pi/2 pi/5 -pi/2];
 Qtransfer=[-pi/15 -pi/9 -5*pi/18 -pi/2]; 
 ft=100; % path update rate [Hz] (1/timestep)
 thetaddMax(1,1)=Joint_1.Tau_m_max/(Joint_1.Gear_Ratio*Joint_1.Motor_Inertia); % [rad/s^2] accMax joint 1
-thetaddMax(1,2)=Joint_2.Tau_m_max/(Joint_2.Gear_Ratio*Joint_2.Motor_Inertia); % [rad/s^2] accMax joint 4
-thetaddMax(1,3)=Joint_3.Tau_m_max/(Joint_3.Gear_Ratio*Joint_3.Motor_Inertia); % [rad/s^2] accMax joint 4
+thetaddMax(1,2)=Joint_2.Tau_m_max/(Joint_2.Gear_Ratio*Joint_2.Motor_Inertia); % [rad/s^2] accMax joint 2
+thetaddMax(1,3)=Joint_3.Tau_m_max/(Joint_3.Gear_Ratio*Joint_3.Motor_Inertia); % [rad/s^2] accMax joint 3
 thetaddMax(1,4)=Joint_4.Tau_m_max/(Joint_4.Gear_Ratio*Joint_4.Motor_Inertia); % [rad/s^2] accMax joint 4
 
 %% Trajectory Stowage to Navigation
@@ -126,7 +126,7 @@ qfSto2Nav=Qnavigation';
 [tSto2Nav, qSto2Nav, qdSto2Nav, qddSto2Nav] = trajectoryGenerationSto2Nav...
                                  (q0Sto2Nav, qSto2NavInter1, qSto2NavInter2, qfSto2Nav, thetaddMax, TSto2Nav, ft);
 % Plot
-showTrajSto2Nav(tSto2Nav, qSto2Nav, qdSto2Nav, qddSto2Nav, omegaMax1, omegaMax2, omegaMax3, omegaMax4)
+showTraj(tSto2Nav, qSto2Nav, qdSto2Nav, qddSto2Nav, omegaMax1, omegaMax2, omegaMax3, omegaMax4, thetaddMax,"Sto2Nav")
 
 %% Trajectory Stowage to Retrieval
 
@@ -139,7 +139,7 @@ qfSto2Ret=Qretrieval';
                                  (q0Sto2Ret, qSto2RetInter1, qSto2RetInter2, qfSto2Ret, thetaddMax, TSto2Ret, ft);
 
 % Plot 
-showTrajSto2Ret(tSto2Ret, qSto2Ret, qdSto2Ret, qddSto2Ret, omegaMax1, omegaMax2, omegaMax3, omegaMax4)
+showTraj(tSto2Ret, qSto2Ret, qdSto2Ret, qddSto2Ret, omegaMax1, omegaMax2, omegaMax3, omegaMax4, thetaddMax,"Sto2Ret")
 
 %% Trajectory Retrieval to Transfer
 
@@ -152,7 +152,7 @@ qfRet2Trans=Qtransfer';
                                                 (q0Ret2Trans, qRet2TransInter1, qRet2TransInter2, qfRet2Trans, thetaddMax, TRet2Trans, ft);
 
 % Plot 
-showTrajRet2Trans(tRet2Trans, qRet2Trans, qdRet2Trans, qddRet2Trans, omegaMax1, omegaMax2, omegaMax3, omegaMax4)
+showTraj(tRet2Trans, qRet2Trans, qdRet2Trans, qddRet2Trans, omegaMax1, omegaMax2, omegaMax3, omegaMax4, thetaddMax,"Ret2Trans")
 
 %% Control frequency 
 fc=1000; % [Hz]
@@ -205,6 +205,25 @@ KvRet2Trans=diag(kvRet2Trans);
 % Plot
 showControl(tcRet2Trans, thetaRet2Trans, thetadRet2Trans, thetaddRet2Trans, qDesRet2Trans, qdDesRet2Trans,...
     qddDesRet2Trans, ERet2Trans, tauRet2Trans, tauMotorRet2Trans, iMotorRet2Trans, "Ret2Trans", Joint_1.Tau_m_max, Joint_1.i_tau_m_max)
+
+%% Required Power
+
+PSto2Nav=trapz(tcSto2Nav,tauMotorSto2Nav(1,:).*iMotorSto2Nav(1,:))+...
+         trapz(tcSto2Nav,tauMotorSto2Nav(2,:).*iMotorSto2Nav(2,:))+...
+         trapz(tcSto2Nav,tauMotorSto2Nav(3,:).*iMotorSto2Nav(3,:))+...
+         trapz(tcSto2Nav,tauMotorSto2Nav(4,:).*iMotorSto2Nav(4,:));
+
+PSto2Ret=trapz(tcSto2Ret,tauMotorSto2Ret(1,:).*iMotorSto2Ret(1,:))+...
+         trapz(tcSto2Ret,tauMotorSto2Ret(2,:).*iMotorSto2Ret(2,:))+...
+         trapz(tcSto2Ret,tauMotorSto2Ret(3,:).*iMotorSto2Ret(3,:))+...
+         trapz(tcSto2Ret,tauMotorSto2Ret(4,:).*iMotorSto2Ret(4,:));
+
+PRet2Trans=trapz(tcRet2Trans,tauMotorRet2Trans(1,:).*iMotorRet2Trans(1,:))+...
+         trapz(tcRet2Trans,tauMotorRet2Trans(2,:).*iMotorRet2Trans(2,:))+...
+         trapz(tcRet2Trans,tauMotorRet2Trans(3,:).*iMotorRet2Trans(3,:))+...
+         trapz(tcRet2Trans,tauMotorRet2Trans(4,:).*iMotorRet2Trans(4,:));
+
+P=PSto2Nav+PSto2Ret+PRet2Trans;
 
 %% Manipulator Visualization
 
@@ -277,22 +296,22 @@ set(ret2transButton, 'Callback',  {@(src,event) updatePlot(TableMDHsym, X_Tsym, 
 runtime = toc;
 fprintf('The program took %.2f seconds to run.\n', runtime);
 
-%% Test Analytic InvKine
-
-Qtest = Qretrieval;
-X_W2B = double(subs(X_W2Bsym, [q1, q2, q3, q4], [Qtest(1), Qtest(2), Qtest(3), Qtest(4)]));
-
-ofs2 = pi/2;
-ofs3 = -pi/2;
-ofs4 = pi/6;
-[Qinv] = invkine(X_W2B, UpperArm.Length, ForeArm.Length, d3, ofs2, ofs3, ofs4, "ElbowUp");
-
-Xtest = double(subs(X_W2Bsym, [q1, q2, q3, q4], [Qinv(1), Qinv(2), Qinv(3), Qinv(4)]));
-
-fprintf('\nThe desired pose was:\n [%.4f \t%.4f \t%.4f \t%.4f \t%.4f \t%.4f]\n', X_W2B)
-fprintf('\nThe obtained pose is:\n [%.4f \t%.4f \t%.4f \t%.4f \t%.4f \t%.4f]\n', Xtest)
-fprintf('\nThe desired joint variables were:\n [%.4f \t%.4f \t%.4f \t%.4f]\n', Qtest)
-fprintf('\nThe joint variables are:\n [%.4f \t%.4f \t%.4f \t%.4f]\n', Qinv)
+% %% Test Analytic InvKine
+% 
+% Qtest = Qretrieval;
+% X_W2B = double(subs(X_W2Bsym, [q1, q2, q3, q4], [Qtest(1), Qtest(2), Qtest(3), Qtest(4)]));
+% 
+% ofs2 = pi/2;
+% ofs3 = -pi/2;
+% ofs4 = pi/6;
+% [Qinv] = invkine(X_W2B, UpperArm.Length, ForeArm.Length, d3, ofs2, ofs3, ofs4, "ElbowUp");
+% 
+% Xtest = double(subs(X_W2Bsym, [q1, q2, q3, q4], [Qinv(1), Qinv(2), Qinv(3), Qinv(4)]));
+% 
+% fprintf('\nThe desired pose was:\n [%.4f \t%.4f \t%.4f \t%.4f \t%.4f \t%.4f]\n', X_W2B)
+% fprintf('\nThe obtained pose is:\n [%.4f \t%.4f \t%.4f \t%.4f \t%.4f \t%.4f]\n', Xtest)
+% fprintf('\nThe desired joint variables were:\n [%.4f \t%.4f \t%.4f \t%.4f]\n', Qtest)
+% fprintf('\nThe joint variables are:\n [%.4f \t%.4f \t%.4f \t%.4f]\n', Qinv)
 
 
 
