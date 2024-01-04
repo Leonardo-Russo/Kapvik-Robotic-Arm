@@ -313,5 +313,21 @@ fprintf('The program took %.2f seconds to run.\n', runtime);
 % fprintf('\nThe desired joint variables were:\n [%.4f \t%.4f \t%.4f \t%.4f]\n', Qtest)
 % fprintf('\nThe joint variables are:\n [%.4f \t%.4f \t%.4f \t%.4f]\n', Qinv)
 
+% %%
+% for i=4:12
+%     fh = figure(i);
+%     fh.WindowState = 'maximized';
+% end
+% cd 'G:\Il mio Drive\materiale matteo uni\Ingegneria Spaziale e Astronautica\Space robotic systems\SRS project';
+% print(figure(4),'sto2navcon','-dpng')
+% print(figure(5),'sto2naverr','-dpng')
+% print(figure(6),'sto2navtor','-dpng')
+% print(figure(7),'sto2retcon','-dpng')
+% print(figure(8),'sto2reterr','-dpng')
+% print(figure(9),'sto2rettor','-dpng')
+% print(figure(10),'ret2transcon','-dpng')
+% print(figure(11),'ret2transerr','-dpng')
+% print(figure(12),'ret2transtor','-dpng')
+% cd 'G:\Il mio Drive\Matlab\Robotic\SRS-Project';
 
 
