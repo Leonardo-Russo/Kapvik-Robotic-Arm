@@ -79,7 +79,6 @@ T_T2W = buildT(R_T, P_T);
 % Create Station Frame
 T_S2S = eye(4);
 
-
 %% Define MDH Table
 
 syms q1 q2 q3 q4 q1d q2d q3d q4d q1dd q2dd q3dd q4dd g real
@@ -98,7 +97,11 @@ T_T2Ssym = where_fun(T_S2B, T_W2Bsym, T_T2W);
 X_W2Bsym = simplify(trans2pose(T_W2Bsym));
 X_Tsym = simplify(trans2pose(T_T2Ssym));
 
-% Jsym = simplify(jacobian(X_Tsym, [q1 q2 q3 q4]));
+%% Jacobian
+RJac=R3(q2+q3+q4)*[1 0 0; 0 0 1; 0 -1 0]*R3(q1);
+Psi=atan2(RJac(3,1),-RJac(3,2));
+XJac=[X_Tsym(1:3); Psi];
+Jsym = simplify(jacobian(XJac, [q1 q2 q3 q4]));
 
 %% Dynamical equations (symbolic expression)
 
