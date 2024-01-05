@@ -32,6 +32,14 @@ thetaHAT=zeros(4,length(t));
 thetadHAT=zeros(4,length(t));
 thetaddHAT=zeros(4,length(t));
 
+%% Necessary
+iter1=1;
+iter2=1;
+iter3=1;
+iter4=1;
+iter5=1;
+iter6=1;
+
 %% Integrazione (metodo di Eulero)
 for i=1:length(t)
 
@@ -133,9 +141,12 @@ for i=1:length(t)
 
             if z<0 % reaction of the terrain, (we consider the scoop empty untill z>0)
 
-                [f5, n5] = Reaction(P_T, theta(1,1), theta(2,1), theta(3,1), theta(4,1),...
-                    thetad(1,1), thetad(2,1), thetad(3,1), thetad(4,1),...
-                    thetadd0(1), thetadd0(2), thetadd0(3), thetadd0(4));
+                iter1=iter1+1;
+                if iter1==2
+                    [f5, n5] = Reaction(P_T, theta(1,1), theta(2,1), theta(3,1), theta(4,1),...
+                        0, 0, 0, 0,...
+                        0, 0, 0, 0);
+                end
                 M0=MassMatrix(theta(1,1), theta(2,1), theta(3,1), theta(4,1));
                 V0=Coriolis(theta(1,1), theta(2,1), theta(3,1), theta(4,1), thetad(1,1), thetad(2,1), thetad(3,1), thetad(4,1));
                 G0=Gravity(theta(1,1), theta(2,1), theta(3,1), theta(4,1));
@@ -154,9 +165,13 @@ for i=1:length(t)
 
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             if zHAT<0
-                [f5HAT, n5HAT] = Reaction(P_T, thetaHAT(1,1), thetaHAT(2,1), thetaHAT(3,1), thetaHAT(4,1),...
-                    thetadHAT(4,1), thetadHAT(2,1), thetadHAT(3,1), thetadHAT(4,1),...
-                    thetadd0(1), thetadd0(2), thetadd0(3), thetadd0(4));
+
+                iter2=iter2+1;
+                if iter2==2
+                    [f5HAT, n5HAT] = Reaction(P_T, thetaHAT(1,1), thetaHAT(2,1), thetaHAT(3,1), thetaHAT(4,1),...
+                        0, 0, 0, 0,...
+                        0, 0, 0, 0);
+                end
                 M0HAT=MassMatrix(thetaHAT(1,1), thetaHAT(2,1), thetaHAT(3,1), thetaHAT(4,1));
                 V0HAT=Coriolis(thetaHAT(1,1), thetaHAT(2,1), thetaHAT(3,1), thetaHAT(4,1), thetadHAT(1,1), thetadHAT(2,1), thetadHAT(3,1), thetadHAT(4,1));
                 G0HAT=Gravity(thetaHAT(1,1), thetaHAT(2,1), thetaHAT(3,1), thetaHAT(4,1));
@@ -272,9 +287,12 @@ for i=1:length(t)
 
             if z<0 % reaction of the terrain, (we consider the scoop empty untill z>0)
 
-                [f5, n5] = Reaction(P_T, theta(1,i), theta(2,i), theta(3,i), theta(4,i),...
-                                  thetad(1,i), thetad(2,i), thetad(3,i), thetad(4,i),...
-                                  thetadd(1,i), thetadd(2,i), thetadd(3,i), thetadd(4,i));
+                iter3=iter3+1;
+                if iter3==2
+                    [f5, n5] = Reaction(P_T, theta(1,i), theta(2,i), theta(3,i), theta(4,i),...
+                        0, 0, 0, 0,...
+                        0, 0, 0, 0);
+                end
                 M=MassMatrix(theta(1,i), theta(2,i), theta(3,i), theta(4,i));
                 V=Coriolis(theta(1,i), theta(2,i), theta(3,i), theta(4,i), thetad(1,i), thetad(2,i), thetad(3,i), thetad(4,i));
                 G=Gravity(theta(1,i), theta(2,i), theta(3,i), theta(4,i));
@@ -299,9 +317,12 @@ for i=1:length(t)
 
             if zHAT<0 % reaction of the terrain, (we consider the scoop empty untill z>0)
 
-                [f5HAT, n5HAT] = Reaction(P_T, thetaHAT(1,i), thetaHAT(2,i), thetaHAT(3,i), thetaHAT(4,i),...
-                    thetadHAT(1,i), thetadHAT(2,i), thetadHAT(3,i), thetadHAT(4,i),...
-                    thetaddHAT(1,i), thetaddHAT(2,i), thetaddHAT(3,i), thetaddHAT(4,i));
+                iter4=iter4+1;
+                if iter4==2
+                    [f5HAT, n5HAT] = Reaction(P_T, thetaHAT(1,i), thetaHAT(2,i), thetaHAT(3,i), thetaHAT(4,i),...
+                        0, 0, 0, 0,...
+                        0, 0, 0, 0);
+                end
                 MHAT=MassMatrix(thetaHAT(1,i), thetaHAT(2,i), thetaHAT(3,i), thetaHAT(4,i));
                 VHAT=Coriolis(thetaHAT(1,i), thetaHAT(2,i), thetaHAT(3,i), thetaHAT(4,i), thetadHAT(1,i), thetadHAT(2,i), thetadHAT(3,i), thetadHAT(4,i));
                 GHAT=Gravity(thetaHAT(1,i), thetaHAT(2,i), thetaHAT(3,i), thetaHAT(4,i));
@@ -326,9 +347,12 @@ for i=1:length(t)
 
             if z<0 % reaction of the terrain, (we consider the scoop empty untill z>0)
 
-                [f5, n5] = Reaction(P_T, theta(1,i), theta(2,i), theta(3,i), theta(4,i),...
-                    thetad(1,i), thetad(2,i), thetad(3,i), thetad(4,i),...
-                    thetadd(1,i), thetadd(2,i), thetadd(3,i), thetadd(4,i));
+                iter5=iter5+1;
+                if iter5==2
+                    [f5, n5] = Reaction(P_T, theta(1,i), theta(2,i), theta(3,i), theta(4,i),...
+                        0, 0, 0, 0,...
+                        0, 0, 0, 0);
+                end
                 M=MassMatrix(theta(1,i), theta(2,i), theta(3,i), theta(4,i));
                 V=Coriolis(theta(1,i), theta(2,i), theta(3,i), theta(4,i), thetad(1,i), thetad(2,i), thetad(3,i), thetad(4,i));
                 G=Gravity(theta(1,i), theta(2,i), theta(3,i), theta(4,i));
@@ -353,9 +377,12 @@ for i=1:length(t)
 
             if zHAT<0 % reaction of the terrain, (we consider the scoop empty untill z>0)
 
-                [f5HAT, n5HAT] = Reaction(P_T, thetaHAT(1,i), thetaHAT(2,i), thetaHAT(3,i), thetaHAT(4,i),...
-                    thetadHAT(1,i), thetadHAT(2,i), thetadHAT(3,i), thetadHAT(4,i),...
-                    thetaddHAT(1,i), thetaddHAT(2,i), thetaddHAT(3,i), thetaddHAT(4,i));
+                iter6=iter6+1;
+                if iter6==2
+                    [f5HAT, n5HAT] = Reaction(P_T, thetaHAT(1,i), thetaHAT(2,i), thetaHAT(3,i), thetaHAT(4,i),...
+                        0, 0, 0, 0,...
+                        0, 0, 0, 0);
+                end
                 MHAT=MassMatrix(thetaHAT(1,i), thetaHAT(2,i), thetaHAT(3,i), thetaHAT(4,i));
                 VHAT=Coriolis(thetaHAT(1,i), thetaHAT(2,i), thetaHAT(3,i), thetaHAT(4,i), thetadHAT(1,i), thetadHAT(2,i), thetadHAT(3,i), thetadHAT(4,i));
                 GHAT=Gravity(thetaHAT(1,i), thetaHAT(2,i), thetaHAT(3,i), thetaHAT(4,i));

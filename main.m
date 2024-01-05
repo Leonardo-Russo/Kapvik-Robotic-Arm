@@ -313,7 +313,7 @@ fprintf('The program took %.2f seconds to run.\n', runtime);
 % fprintf('\nThe desired joint variables were:\n [%.4f \t%.4f \t%.4f \t%.4f]\n', Qtest)
 % fprintf('\nThe joint variables are:\n [%.4f \t%.4f \t%.4f \t%.4f]\n', Qinv)
 
-% %%
+%%
 % for i=4:12
 %     fh = figure(i);
 %     fh.WindowState = 'maximized';
