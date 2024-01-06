@@ -98,7 +98,7 @@ X_W2Bsym = simplify(trans2pose(T_W2Bsym));
 X_Tsym = simplify(trans2pose(T_T2Ssym));
 
 RJac=R3(q2+q3+q4)*[1 0 0; 0 0 1; 0 -1 0]*R3(q1);
-Psi=atan2(RJac(3,1),RJac(2,3));
+Psi=atan2(RJac(1,3),RJac(2,3));
 XJac=[X_Tsym(1:3); Psi];
 Jsym = simplify(jacobian(XJac, [q1 q2 q3 q4]));
 
